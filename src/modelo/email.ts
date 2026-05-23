@@ -1,34 +1,42 @@
+import { Customer } from "./customer";
+
+export type propsEmail = {
+    id: string;
+    customerId: string;
+    customer?: Customer;
+    email: string;
+}
 export class Email{
-    private id: string;
-    private clientId: string;
-    private email: string;
+    constructor(private props: propsEmail) {}
 
-    constructor(id: string = crypto.randomUUID().toString(), clientId: string, email: string) 
-        {
-        if(!clientId){
-            throw new Error("Invalid client");
-        }
-        if(!email){
-            throw new Error("Invalid email");
-        }
-        this.id = id;
-        this.clientId = clientId;
-        this.email = email;
+    public static construct(
+        customerId: string,
+        email: string,
+    ) {
+        if(!customerId){throw new Error("Invalid customer")}
+        if(!email){throw new Error("Email field is required");}
+
+        const props: propsEmail = {
+            id: crypto.randomUUID().toString(),
+            customerId,
+            email
+        };
+        return new Email(props);
     }
 
-    public static reconstruct(id: string, clientId: string, email: string){
-        return new Email(id, clientId, email);
+    public static reconstruct(props: propsEmail) {
+        return new Email(props);
     }
 
-    public getId(){
-        return this.id;
+    public get id(){
+        return this.props.id;
     }
 
-    public getClientId(){
-        return this.clientId;
+    public get customerId(){
+        return this.props.customerId;
     }
 
-    public getEmail(){
-        return this.email;
+    public get email(){
+        return this.props.email;
     }
 }

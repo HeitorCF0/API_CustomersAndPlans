@@ -1,4 +1,7 @@
-type customerStatus = 'active' | 'inactive';
+export enum customerStatus {
+    Active = 'ACTIVE',
+    Inactive = 'INACTIVE'
+}
 
 export type propsCustomer = {
     id: string;
@@ -10,15 +13,13 @@ export type propsCustomer = {
 export class Customer {
     constructor(private props: propsCustomer) {}
 
-    public static construct(name: string, createdAt: Date, status: customerStatus) {
-        if (!name || !createdAt || !status) {
-            throw new Error("All fields are required");
-        }
+    public static construct(name: string) {
+        if (!name) {throw new Error("Name field is required");}
         const props: propsCustomer = {
             id: crypto.randomUUID().toString(),
             name,
-            createdAt,
-            status
+            createdAt: new Date(),
+            status: customerStatus.Active
         }
         return new Customer(props);
     }

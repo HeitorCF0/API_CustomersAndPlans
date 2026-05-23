@@ -1,34 +1,40 @@
+import { Customer } from "./customer";
+
+export type propsPhone = {
+    id: string;
+    customerId: string;
+    phone: string;
+}
+
 export class Phone{
-    private id: string;
-    private clientId: string;
-    private phone: string;
 
-    constructor(id: string = crypto.randomUUID().toString(), clientId: string, phone: string) 
-        {
-        if(!clientId){
-            throw new Error("Invalid client");
-        }
-        if(!phone){
-            throw new Error("Invalid phone");
-        }
-        this.id = id;
-        this.clientId = clientId;
-        this.phone = phone;
+    constructor(private props: propsPhone) {}
+
+    public static construct(customerId: string, phone: string) {
+        if(!customerId){throw new Error("Invalid customer")}
+        if(!phone){throw new Error("Phone field is required");}
+
+        const props: propsPhone = {
+            id: crypto.randomUUID().toString(),
+            customerId,
+            phone
+        };
+        return new Phone(props);
     }
 
-    public static reconstruct(id: string, clientId: string, phone: string){
-        return new Phone(id, clientId, phone);
+    public static reconstruct(props: propsPhone){
+        return new Phone(props);
     }
 
-    public getId(){
-        return this.id;
+    public get id(){
+        return this.props.id;
     }
 
-    public getClientId(){
-        return this.clientId;
+    public get customerId(){
+        return this.props.customerId;
     }
 
-    public getPhone(){
-        return this.phone;
+    public get phone(){
+        return this.props.phone;
     }
 }

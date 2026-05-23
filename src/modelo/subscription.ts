@@ -1,11 +1,19 @@
-type subscriptionState = 'active' | 'inactive';
+import { Customer } from "./customer";
+import { Plan } from "./plan";
+
+export enum subscriptionState {
+    ACTIVE = 'active',
+    INACTIVE = 'inactive'
+}
 
 export type propsSubscription = {
     id: string;
     customerId: string;
+    customer?: Customer;
     planId: string;
+    plan?: Plan;
     startDate: Date;
-    endDate: Date|null;
+    endDate: Date | null;
     state: subscriptionState;
 }
 
@@ -23,7 +31,7 @@ export class Subscription {
             planId,
             startDate,
             endDate: null,
-            state,
+            state: subscriptionState.ACTIVE,
         }
         return new Subscription(props);
     }

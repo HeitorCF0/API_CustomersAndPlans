@@ -1,31 +1,39 @@
+import { Subscription } from "./subscription";
+
 //parcela
-type installmentState = 'paid' | 'pending' | 'overdue';
+export enum installmentState {
+    Paid = 'PAID',
+    Pending = 'PENDING',
+    Overdue = 'OVERDUE'
+}
 
 export type propsInstallment = {
     id: string;
     subscriptionId: string;
+    subscription?: Subscription;
     amount: number;
     dueDate: Date; //vencimento
     state: installmentState;
-    paidAt: Date|null;
+    paidAt?: Date|null;
     createdAt: Date;
 }
 
 export class Installment {
     constructor(private props: propsInstallment) {}
 
-    public static construct(subscriptionId: string, amount: number, dueDate: Date, state: installmentState, createdAt: Date) {
-        if (!subscriptionId || !amount || !dueDate || !state || !createdAt) {
-            throw new Error("All fields are required");
-        }
+    public static construct(subscriptionId: string, amount: number, dueDate: Date) {
+        if (!subscriptionId) {throw new Error("SubscriptionId field is required")}
+        if (!amount) {throw new Error("Amount field is required")}
+        if (!dueDate) {throw new Error("DueDate field is required")}
+
         const props: propsInstallment = {
             id: crypto.randomUUID().toString(),
             subscriptionId,
             amount,
             dueDate,
-            state,
+            state: installmentState.Pending,
             paidAt: null,
-            createdAt
+            createdAt: new Date()
         }
         return new Installment(props);
     }

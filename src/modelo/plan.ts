@@ -1,9 +1,16 @@
-type planType = 'weekly' | 'monthly' | 'bimonthly' | 'quarterly' | 'semiannual' | 'yearly';
+export enum planType {
+    Weekly = 'WEEKLY',
+    Monthly = 'MONTHLY',
+    Bimonthly = 'BIMONTHLY',
+    Quarterly = 'QUARTERLY',
+    Semiannual = 'SEMIANNUAL',
+    Yearly = 'YEARLY'
+}
 
 export type propsPlan = {
     id: string;
     name: string;
-    description: string;
+    description: string | null;
     price: number;
     type: planType;
     createdAt: Date;
@@ -12,17 +19,18 @@ export type propsPlan = {
 export class Plan {
     constructor(private props: propsPlan) {}
 
-    public static construct(name: string, description: string, price: number, type: planType, createdAt: Date) {
-        if (!name || !description || !price || !type || !createdAt) {
-            throw new Error("All fields are required");
-        }
+    public static construct(name: string, description: string | null, price: number, type: planType) {
+        if (!name) {throw new Error("Name fields is required");}
+        if (!price) {throw new Error("Price fields is required");}
+        if (!type) {throw new Error("Type fields is required");}
+
         const props: propsPlan = {
             id: crypto.randomUUID().toString(),
             name,
             description,
             price,
             type,
-            createdAt
+            createdAt: new Date()
         }
         return new Plan(props);
     }

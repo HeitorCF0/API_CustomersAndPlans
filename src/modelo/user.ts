@@ -1,4 +1,7 @@
-type UserRole = 'admin' | 'worker';
+export enum UserRole {
+    Admin = 'ADMIN',
+    Worker = 'WORKER'
+}
 
 export type propsUser = {
     id: string;

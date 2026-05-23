@@ -1,70 +1,92 @@
+import { Customer } from "./customer";
+
+export type propsAdress = {
+    id: string;
+    customerId: string;
+    number: string | null;
+    street: string | null;
+    neighborhood: string | null;
+    city: string;
+    state: string;
+    complement: string | null;
+    cep: string | null;
+}
+
 export class Adress{
-    private id: string;
-    private clientId: string;
-    private number: string;
-    private street: string;
-    private neighborhood: string;
-    private city: string;
-    private state: string;
-    private complement: string|null;
-    private cep: string;
+    private constructor(
+        private props: propsAdress
+    ) {}
 
-    constructor(id: string = crypto.randomUUID().toString(), clientId: string, street: string, number: string, neighborhood: string, city: string, state: string, cep: string, complement: string|null = null) 
-        {
-        if(!clientId){
-            throw new Error("Invalid client");
+    public static construct(
+        customerId: string, 
+        street: string | null, 
+        number: string | null, 
+        neighborhood: string | null, 
+        city: string, 
+        state: string, 
+        cep: string | null, 
+        complement: string | null
+    ) {
+        if(!customerId){
+            throw new Error("Invalid customerId");
         }
-        if(!street || !number || !city || !state || !cep){
-            throw new Error("All fields are required, except complement");
+        if(!city || !state){
+            throw new Error("City and state are required");
         }
-        this.id = id;
-        this.clientId = clientId;
-        this.number = number;
-        this.street = street;
-        this.neighborhood = neighborhood;
-        this.city = city;
-        this.state = state;
-        this.cep = cep;
-        this.complement = complement;
+        const id = crypto.randomUUID().toString();
+        const props: propsAdress = {
+            id,
+            customerId,
+            street,
+            number,
+            neighborhood,
+            city,
+            state,
+            complement,
+            cep
+        };
+        return new Adress(props);
     }
 
-    public static reconstruct(id: string, clientId: string, street: string, number: string, neighborhood: string, city: string, state: string, cep: string, complement: string|null = null){
-        return new Adress(id, clientId, street, number, neighborhood, city, state, cep, complement);
+    public static reconstruct(
+        props: propsAdress
+    ) {
+        return new Adress(props);
     }
 
-    public getId(){
-        return this.id;
+    public get id(){
+        return this.props.id;
     }
 
-    public getClientId(){
-        return this.clientId;
+    public get customerId(){
+        return this.props.customerId;
     }
 
-    public getNumber(){
-        return this.number;
+    public get number(){
+        return this.props.number;
     }
 
-    public getStreet(){
-        return this.street;
+    public get street(){
+        return this.props.street;
     }
 
-    public getNeighborhood(){
-        return this.neighborhood;
+    public get neighborhood(){
+        return this.props.neighborhood;
     }
 
-    public getCity(){
-        return this.city;
+    public get city(){
+        return this.props.city;
     }
 
-    public getState(){
-        return this.state;
+    public get state(){
+        return this.props.state;
     }
 
-    public getCep(){
-        return this.cep;
+    public get cep(){
+        return this.props.cep;
     }
 
-    public getComplement(){
-        return this.complement;
+    public get complement(){
+        return this.props.complement;
     }
 }

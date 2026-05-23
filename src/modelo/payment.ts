@@ -1,18 +1,30 @@
-type paymentStatus = 'paid' | 'pending' | 'failed';
+import { Installment } from "./installment";
+
+export enum paymentStatus {
+    Paid = 'PAID',
+    Pending = 'PENDING',
+    Failed = 'FAILED'
+}
 
 export type propsPayment = {
     id: string;
     installmentId: string;
+    installment?: Installment;
     amount: number;
     status: paymentStatus;
-    comment: string|null;
+    comment: string | null;
     paidDate: Date;
 }
 
 export class Payment {
     constructor(private props: propsPayment) {}
 
-    public static construct(installmentId: string, amount: number, status: paymentStatus, comment: string|null) {
+    public static construct(
+        installmentId: string, 
+        amount: number, 
+        status: paymentStatus, 
+        comment: string | null) 
+        {
         if (!installmentId || !amount || !status) {
             throw new Error("All fields are required");
         }
