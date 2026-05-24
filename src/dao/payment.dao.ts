@@ -5,8 +5,8 @@ export class PaymentDAO {
     async create(payment: Payment): Promise<void> {
         try {
             const [result] = await connection.query(
-                'INSERT INTO payments (id, installmentId, amount, status, comment, paidDate) VALUES (?, ?, ?, ?, ?, ?)', 
-                [payment.id, payment.installmentId, payment.amount, payment.status, payment.comment, payment.paidDate]
+                'INSERT INTO payments (id, installmentId, amount, paymentMethod, status, comment, paidDate) VALUES (?, ?, ?, ?, ?, ?)', 
+                [payment.id, payment.installmentId, payment.amount, payment.paymentMethod, payment.status, payment.comment, payment.paidDate]
             );
         } catch (error) {
             console.error('Error creating payment:', error);
@@ -37,8 +37,8 @@ export class PaymentDAO {
     async update(payment: Payment): Promise<void> {
         try {
             const [result] = await connection.query(
-                'UPDATE payments SET installmentId = ?, amount = ?, status = ?, comment = ?, paidDate = ? WHERE id = ?',
-                [payment.installmentId, payment.amount, payment.status, payment.comment, payment.paidDate, payment.id]
+                'UPDATE payments SET installmentId = ?, amount = ?, paymentMethod = ?, status = ?, comment = ?, paidDate = ? WHERE id = ?',
+                [payment.installmentId, payment.amount, payment.paymentMethod, payment.status, payment.comment, payment.paidDate, payment.id]
             );
         } catch (error) {
             console.error('Error updating payment:', error);

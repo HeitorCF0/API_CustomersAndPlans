@@ -5,8 +5,8 @@ export class EmailDAO {
     async create(email: Email): Promise<void> {
         try {
             const [result] = await connection.query(
-                'INSERT INTO emails (id, clienteId, email) VALUES (?, ?, ?)', 
-                [email.getId(), email.getClientId(), email.getEmail()]
+                'INSERT INTO emails (id, customerId, email) VALUES (?, ?, ?)', 
+                [email.id, email.customerId, email.email]
             );
         } catch (error) {
             console.error('Error creating email:', error);
@@ -17,7 +17,7 @@ export class EmailDAO {
     async searchAll(): Promise<Email[]> {
         try {
             const [rows] = await connection.query('SELECT * FROM emails');
-            return rows.map((row: any) => {return Email.reconstruct(row.id, row.clienteId, row.email)});
+            return rows.map((row: any) => {return Email.reconstruct({id: row.id, customerId: row.customerId, email: row.email})});
         } catch (error) {
             console.error('Error searching emails:', error);
             throw new Error('Failed to search emails');
@@ -30,7 +30,7 @@ export class EmailDAO {
             if (rows.length === 0) {
                 return null;
             }
-            return Email.reconstruct(rows[0].id, rows[0].clienteId, rows[0].email);
+            return Email.reconstruct(rows[0]);
         } catch (error) {
             console.error('Error searching email by ID:', error);
             throw new Error('Failed to search email by ID');
@@ -39,8 +39,8 @@ export class EmailDAO {
 
     async searchByClientId(clientId: string): Promise<Email[]> {
         try {
-            const [rows] = await connection.query('SELECT * FROM emails WHERE clienteId = ?', [clientId]);
-            return rows.map((row: any) => {return {id: row.id, email: row.email}});
+            const [rows] = await connection.query('SELECT * FROM emails WHERE customerId = ?', [clientId]);
+            return rows.map((row: any) => {return Email.reconstruct({id: row.id, customerId: row.customerId, email: row.email})});
         } catch (error) {
             console.error('Error searching email by client ID:', error);
             throw new Error('Failed to search email by client ID');
@@ -49,7 +49,7 @@ export class EmailDAO {
 
     async update(email: Email): Promise<void> {
         try{
-            const [result] = await connection.query('UPDATE emails SET email = ? WHERE id = ?', [email.getEmail(), email.getId()]);
+            const [result] = await connection.query('UPDATE emails SET email = ? WHERE id = ?', [email.email, email.id]);
             if (result.affectedRows === 0) {
                 throw new Error('Email not found');
             }
@@ -73,7 +73,7 @@ export class EmailDAO {
 
     async deleteByClientId(clientId: string): Promise<void> {
         try{
-            const [result] = await connection.query('DELETE FROM emails WHERE clienteId = ?', [clientId]);
+            const [result] = await connection.query('DELETE FROM emails WHERE customerId = ?', [clientId]);
             if (result.affectedRows === 0) {
                 throw new Error('Email not found');
             }

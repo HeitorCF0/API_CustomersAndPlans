@@ -13,7 +13,6 @@ export type propsSubscription = {
     planId: string;
     plan?: Plan;
     startDate: Date;
-    endDate: Date | null;
     state: subscriptionState;
 }
 
@@ -30,7 +29,6 @@ export class Subscription {
             customerId,
             planId,
             startDate,
-            endDate: null,
             state: subscriptionState.ACTIVE,
         }
         return new Subscription(props);
@@ -54,10 +52,6 @@ export class Subscription {
 
     public get startDate(){
         return this.props.startDate;
-    }
-
-    public get endDate(){
-        return this.props.endDate;
     }
 
     public get state(){

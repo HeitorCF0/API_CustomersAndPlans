@@ -16,7 +16,8 @@ export class UserDAO {
 
     async searchAll(): Promise<User[]> {
         try {
-            const [rows] = await connection.query('SELECT * FROM users');
+            const [rows] = await connection.query(
+                'SELECT id, name, role FROM users');
             return rows.map((row: any) => {return {id: row.id, name: row.name, role: row.role}});
         } catch (error) {
             console.error('Error searching users:', error);
@@ -26,7 +27,7 @@ export class UserDAO {
 
     async searchById(id: number): Promise<User | null> {
         try {
-            const [rows] = await connection.query('SELECT * FROM users WHERE id = ?', [id]);
+            const [rows] = await connection.query('SELECT id, name, email, role FROM users WHERE id = ?', [id]);
             if (rows.length === 0) {
                 return null;
             }

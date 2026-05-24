@@ -5,8 +5,16 @@ export class AdressDAO {
     async create(adress: Adress): Promise<void> {
         try {
             const [result] = await connection.query(
-                'INSERT INTO adresses (id, clientId, street, number, neighborhood, city, state, cep, complement) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-                [adress.getId(), adress.getClientId(), adress.getStreet(), adress.getNumber(), adress.getNeighborhood(), adress.getCity(), adress.getState(), adress.getCep(), adress.getComplement()]
+                'INSERT INTO adresses (id, clientId, street, number, neighborhood, city, state, cep, complement) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+                    adress.id, 
+                    adress.customerId, 
+                    adress.street, 
+                    adress.number, 
+                    adress.neighborhood, 
+                    adress.city, 
+                    adress.state, 
+                    adress.cep, 
+                    adress.complement]
             );
         } catch (error) {
             console.error('Error creating adress:', error);
@@ -14,13 +22,22 @@ export class AdressDAO {
         }
     }
 
-    async searchAll(clientId: string): Promise<Adress[]> {
+    async searchAll(customerId: string): Promise<Adress[]> {
         try {
-            const [rows] = await connection.query('SELECT * FROM adresses WHERE clientId = ?', [clientId]);
-            return rows.map((row: any) => Adress.reconstruct(row.id, row.clientId, row.street, row.number, row.neighborhood, row.city, row.state, row.cep, row.complement));
+            const [rows] = await connection.query('SELECT * FROM adresses WHERE customerId = ?', [customerId]);
+            return rows.map((row: any) => Adress.reconstruct({
+                id: row.id, 
+                customerId: row.customerId, 
+                street: row.street, 
+                number: row.number, 
+                neighborhood: row.neighborhood, 
+                city: row.city, 
+                state: row.state, 
+                cep: row.cep, 
+                complement: row.complement}));
         } catch (error) {
-            console.error('Error searching adresses by client ID:', error);
-            throw new Error('Failed to search adresses by client ID');
+            console.error('Error searching adresses by customer ID:', error);
+            throw new Error('Failed to search adresses by customer ID');
         }
     }
 
@@ -30,7 +47,7 @@ export class AdressDAO {
             if (rows.length === 0) {
                 return null;
             }
-            return Adress.reconstruct(rows[0].id, rows[0].clientId, rows[0].street, rows[0].number, rows[0].neighborhood, rows[0].city, rows[0].state, rows[0].cep, rows[0].complement);
+            return Adress.reconstruct(rows[0]);
         } catch (error) {
             console.error('Error searching adress by ID:', error);
             throw new Error('Failed to search adress by ID');
@@ -40,7 +57,17 @@ export class AdressDAO {
     async searchByClientId(clientId: string): Promise<Adress[]> {
         try {
             const [rows] = await connection.query('SELECT * FROM adresses WHERE clientId = ?', [clientId]);
-            return rows.map((row: any) => {return { id: row.id, street: row.street, number: row.number, neighborhood: row.neighborhood, city: row.city, state: row.state, cep: row.cep, complement: row.complement }});
+            return rows.map((row: any) => Adress.reconstruct({
+                id: row.id, 
+                customerId: row.customerId, 
+                street: row.street, 
+                number: row.number, 
+                neighborhood: row.neighborhood, 
+                city: row.city, 
+                state: row.state, 
+                cep: row.cep, 
+                complement: row.complement
+            }));
         } catch (error) {
             console.error('Error searching adresses by client ID:', error);
             throw new Error('Failed to search adresses by client ID');
@@ -51,7 +78,7 @@ export class AdressDAO {
         try{
             const [result] = await connection.query(
                 'UPDATE adresses SET street = ?, number = ?, neighborhood = ?, city = ?, state = ?, cep = ?, complement = ? WHERE id = ?',
-                [adress.getStreet(), adress.getNumber(), adress.getNeighborhood(), adress.getCity(), adress.getState(), adress.getCep(), adress.getComplement(), adress.getId()]
+                [adress.street, adress.number, adress.neighborhood, adress.city, adress.state, adress.cep, adress.complement, adress.id]
             );
         } catch (error) {
             console.error('Error updating adress:', error);

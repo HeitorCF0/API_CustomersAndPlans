@@ -6,6 +6,15 @@ export enum paymentStatus {
     Failed = 'FAILED'
 }
 
+export enum paymentMethod {
+    CreditCard = 'CREDIT_CARD',
+    DebitCard = 'DEBIT_CARD',
+    BankTransfer = 'BANK_TRANSFER',
+    Cash = 'CASH',
+    Pix = 'PIX',
+    Other = 'OTHER'
+}
+
 export type propsPayment = {
     id: string;
     installmentId: string;
@@ -14,6 +23,7 @@ export type propsPayment = {
     status: paymentStatus;
     comment: string | null;
     paidDate: Date;
+    paymentMethod: paymentMethod;
 }
 
 export class Payment {
@@ -22,8 +32,10 @@ export class Payment {
     public static construct(
         installmentId: string, 
         amount: number, 
+        paymentMethod: paymentMethod,
         status: paymentStatus, 
-        comment: string | null) 
+        comment: string | null
+    ) 
         {
         if (!installmentId || !amount || !status) {
             throw new Error("All fields are required");
@@ -32,6 +44,7 @@ export class Payment {
             id: crypto.randomUUID().toString(),
             installmentId,
             amount,
+            paymentMethod,
             status,
             comment,
             paidDate: new Date()
@@ -53,6 +66,10 @@ export class Payment {
 
     public get amount(){
         return this.props.amount;
+    }
+
+    public get paymentMethod(){
+        return this.props.paymentMethod;
     }
 
     public get status(){

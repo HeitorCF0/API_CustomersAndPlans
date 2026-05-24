@@ -5,11 +5,11 @@ const app = express();
 
 app.use(express.json());
 
-const pConexao = mysql.createPool({
+const connection = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: '',
-  database: '',
+  database: 'API_web',
 });
 
 
