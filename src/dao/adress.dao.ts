@@ -1,5 +1,8 @@
 import { Adress } from "../modelo/adress";
 import { connection } from "../util/connection";
+import { AdressListDTO } from "../dto/adress.dto";
+import { RowDataPacket } from "mysql2";
+import { Customer } from "../modelo/customer";
 
 export class AdressDAO {
     async create(adress: Adress): Promise<void> {
@@ -22,19 +25,10 @@ export class AdressDAO {
         }
     }
 
-    async searchAll(customerId: string): Promise<Adress[]> {
+    async searchAll(): Promise<AdressListDTO[]> {
         try {
-            const [rows] = await connection.query('SELECT * FROM adresses WHERE customerId = ?', [customerId]);
-            return rows.map((row: any) => Adress.reconstruct({
-                id: row.id, 
-                customerId: row.customerId, 
-                street: row.street, 
-                number: row.number, 
-                neighborhood: row.neighborhood, 
-                city: row.city, 
-                state: row.state, 
-                cep: row.cep, 
-                complement: row.complement}));
+            const [adressListDTO] = await connection.query<AdressListDTO[] & RowDataPacket[]>('SELECT a.*, c.customerName FROM adresses JOIN customers c');
+            return adressListDTO;
         } catch (error) {
             console.error('Error searching adresses by customer ID:', error);
             throw new Error('Failed to search adresses by customer ID');
@@ -54,20 +48,10 @@ export class AdressDAO {
         }
     }
 
-    async searchByClientId(clientId: string): Promise<Adress[]> {
+    async searchByClientId(clientId: string): Promise<Adress | null> {
         try {
             const [rows] = await connection.query('SELECT * FROM adresses WHERE clientId = ?', [clientId]);
-            return rows.map((row: any) => Adress.reconstruct({
-                id: row.id, 
-                customerId: row.customerId, 
-                street: row.street, 
-                number: row.number, 
-                neighborhood: row.neighborhood, 
-                city: row.city, 
-                state: row.state, 
-                cep: row.cep, 
-                complement: row.complement
-            }));
+            return rows.length > 0 ? this.mapAdress(rows[0]) : null;
         } catch (error) {
             console.error('Error searching adresses by client ID:', error);
             throw new Error('Failed to search adresses by client ID');
@@ -108,5 +92,37 @@ export class AdressDAO {
             console.error('Error deleting adresses by client ID:', error);
             throw new Error('Failed to delete adresses by client ID');
         }
+    }
+
+    private mapAdress(row: any) : Adress {
+        const phone = Adress.reconstruct({
+            id: row.id, 
+            customerId: row.customerId, 
+            street: row.street, 
+            number: row.number, 
+            neighborhood: row.neighborhood, 
+            city: row.city, 
+            state: row.state, 
+            cep: row.cep, 
+            complement: row.complement,
+        });
+        const customer = Customer.reconstruct({
+            id: row.customerId,
+            name: row.customerName,
+            createdAt: row.customerCreatedAt,
+            status: row.customerStatus
+        });
+        return Adress.reconstruct({
+            id: row.id, 
+            customerId: row.customerId, 
+            customer,
+            street: row.street, 
+            number: row.number, 
+            neighborhood: row.neighborhood, 
+            city: row.city, 
+            state: row.state, 
+            cep: row.cep, 
+            complement: row.complement,
+        });
     }
 }

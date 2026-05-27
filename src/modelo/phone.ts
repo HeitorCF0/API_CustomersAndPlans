@@ -3,6 +3,7 @@ import { Customer } from "./customer";
 export type propsPhone = {
     id: string;
     customerId: string;
+    customer?: Customer;
     phone: string;
 }
 

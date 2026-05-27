@@ -16,8 +16,8 @@ export class CustomerDAO {
 
     async searchAll(): Promise<Customer[]> {
         try {
-            const [rows] = await connection.query('SELECT * FROM customers');
-            return rows.map((row: any) => {return {id: row.id, name: row.name, status: row.status}});
+            const [rows] = await connection.query('SELECT id, name, createdAt FROM customers');
+            return rows.map((row: any) => {return {id: row.id, name: row.name, createdAt: row.createdAt}});
         } catch (error) {
             console.error('Error searching customers:', error);
             throw new Error('Failed to search customers');

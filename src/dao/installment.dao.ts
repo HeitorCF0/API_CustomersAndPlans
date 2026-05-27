@@ -1,5 +1,7 @@
+import { InstallmentListByIdDTO, InstallmentListDTO } from "../dto/installment.dto";
 import { Installment } from "../modelo/installment";
 import { connection } from "../util/connection";
+import { RowDataPacket } from "mysql2";
 
 export class InstallmentDAO {
     async create(installment: Installment): Promise<void> {
@@ -14,65 +16,131 @@ export class InstallmentDAO {
         }
     }
 
-    async searchAll(): Promise<Installment[]> {
+    async searchAll(): Promise<InstallmentListDTO[]> {
         try {
-            const [rows] = await connection.query('SELECT * FROM installments');
-            return rows.map((row: any) => { return {id: row.id, subscriptionId: row.subscriptionId, dueDate: row.dueDate, amount: row.amount, state: row.state}});
+            const [installmentListDTO] = await connection.query<InstallmentListDTO[] & RowDataPacket[]>(`
+                SELECT 
+                i.id, 
+                i.state, 
+                i.amount, 
+                c.name,
+                p.name
+                FROM installments i 
+                JOIN subscriptions s 
+                ON i.subscriptionId = s.id
+                JOIN customers c 
+                ON s.customerId = c.id 
+                JOIN plans p ON s.planId = p.id`);
+            return installmentListDTO;
         } catch (error) {
             console.error('Error searching all installments:', error);
             throw new Error('Failed to search all installments');
         }
     }
 
-    async searchById(id: number): Promise<Installment | null> {
+    async searchById(id: number): Promise<InstallmentListByIdDTO | null> {
         try {
-            const [rows] = await connection.query('SELECT * FROM installments WHERE id = ?', [id]);
-            if (rows.length === 0) {
+            const [installmentListByIdDTO] = await connection.query<InstallmentListByIdDTO[] & RowDataPacket[]>(`
+                SELECT
+                i.id,
+                i.state,
+                i.amount,
+                i.dueDate,
+                i.subscriptionId,
+                i.createdAt,
+                i.paidAt,
+                c.name,
+                p.name
+                FROM installments i
+                JOIN subscriptions s
+                ON i.subscriptionsId = s.id
+                JOIN customers c
+                ON s.customersId = c.id
+                JOIN plans p ON s.planId = p.id WHERE i.id = ?`, [id]);
+            if (installmentListByIdDTO.length === 0) {
                 return null;
             }
-            const installment = Installment.reconstruct(rows[0]);
-            return installment;
+            return installmentListByIdDTO[0];
         } catch (error) {
             console.error('Error searching installment by ID:', error);
             throw new Error('Failed to search installment by ID');
         }
     }
 
-    async seartchBySubscriptionId(subscriptionId: string): Promise<Installment[]> {
+    async searchBySubscriptionId(subscriptionId: string): Promise<InstallmentListDTO[]> {
         try {
-            const [rows] = await connection.query('SELECT * FROM installments WHERE subscriptionId = ?', [subscriptionId]);
-            return rows.map((row: any) => { return {id: row.id, subscriptionId: row.subscriptionId, dueDate: row.dueDate, amount: row.amount, state: row.state}});
+            const [installmentListDTO] = await connection.query<InstallmentListDTO[] & RowDataPacket[]>(`
+                SELECT 
+                i.id, 
+                i.state, 
+                i.amount, 
+                c.name,
+                p.name
+                FROM installments i 
+                JOIN subscriptions s 
+                ON i.subscriptionId = s.id
+                JOIN customers c 
+                ON s.customerId = c.id 
+                JOIN plans p ON s.planId = p.id
+                WHERE s.id = ?`, [subscriptionId]);
+            return installmentListDTO;
         } catch (error) {
             console.error('Error searching installments by subscription ID:', error);
             throw new Error('Failed to search installments by subscription ID');
         }
     }
 
-    async searchByPlanId(planId: string): Promise<Installment[]> {
+    async searchByPlanId(planId: string): Promise<InstallmentListDTO[]> {
         try {
-            const [rows] = await connection.query(
-                'SELECT i.* FROM installments i JOIN subscriptions s ON i.subscriptionId = s.id WHERE s.planId = ?', 
+            const [installmentListDTO] = await connection.query<InstallmentListDTO[] & RowDataPacket[]>(`
+                SELECT 
+                i.id, 
+                i.state, 
+                i.amount, 
+                c.name,
+                p.name
+                FROM installments i 
+                JOIN subscriptions s 
+                ON i.subscriptionId = s.id
+                JOIN customers c 
+                ON s.customerId = c.id 
+                JOIN plans p ON s.planId = p.id
+                WHERE s.planId = ?`, 
                 [planId]
             );
-            return rows.map((row: any) => { return {id: row.id, subscriptionId: row.subscriptionId, dueDate: row.dueDate, amount: row.amount, state: row.state}});
+            return installmentListDTO;
         } catch (error) {
             console.error('Error searching installments by plan ID:', error);
             throw new Error('Failed to search installments by plan ID');
         }
     }
 
-    async searchByCustomerId(customerId: string): Promise<Installment[]> {
+    async searchByCustomerId(customerId: string): Promise<InstallmentListDTO[]> {
         try {
-            const [rows] = await connection.query(
-                'SELECT i.* FROM installments i JOIN subscriptions s ON i.subscriptionId = s.id WHERE s.customerId = ?', 
+            const [installmentListDTO] = await connection.query<InstallmentListDTO[] & RowDataPacket[]>(`
+                SELECT 
+                i.id, 
+                i.state, 
+                i.amount, 
+                c.name,
+                p.name
+                FROM installments i 
+                JOIN subscriptions s 
+                ON i.subscriptionId = s.id
+                JOIN customers c 
+                ON s.customerId = c.id 
+                JOIN plans p ON s.planId = p.id
+                WHERE s.customerId = ?`, 
                 [customerId]
             );
-            return rows.map((row: any) => { return {id: row.id, subscriptionId: row.subscriptionId, dueDate: row.dueDate, amount: row.amount, state: row.state}});
+            return installmentListDTO;
         } catch (error) {
             console.error('Error searching installments by customer ID:', error);
             throw new Error('Failed to search installments by customer ID');
         }
     }
+
+
 
     async update(installment: Installment): Promise<void> {
         try{

@@ -2,6 +2,8 @@ import { Subscription } from "../modelo/subscription";
 import { connection } from "../util/connection";
 import { Customer } from "../modelo/customer";
 import { Plan } from "../modelo/plan";
+import { SubscriptionListDTO } from "../dto/subscription.dto";
+import { RowDataPacket } from "mysql2";
 
 export class SubscriptionDAO {
     async create(subscription: Subscription): Promise<void> {
@@ -16,9 +18,9 @@ export class SubscriptionDAO {
         }
     }
 
-    async searchAll(): Promise<any[]> {// CONSERTAR TIPAGEM
+    async searchAll(): Promise<SubscriptionListDTO[]> {// CONSERTAR TIPAGEM
         try {
-            const [rows] = await connection.query(
+            const [subscriptionListDTO] = await connection.query<SubscriptionListDTO[] & RowDataPacket[]>(
                 `SELECT 
                 sub.id,
                 sub.customerId,
@@ -30,7 +32,7 @@ export class SubscriptionDAO {
                 JOIN customers c ON sub.customerId = c.id 
                 JOIN plans p ON sub.planId = p.id`
             );
-            return rows.map((row: any) => this.mapRowToSubscription(row));
+            return subscriptionListDTO;
         } catch (error) {
             console.error('Error searching subscriptions:', error);
             throw new Error('Failed to search subscriptions');
@@ -65,9 +67,9 @@ export class SubscriptionDAO {
         }
     }
 
-    async searchByCustomerId(customerId: string): Promise<Subscription[]> {
+    async searchByCustomerId(customerId: string): Promise<SubscriptionListDTO[]> {
         try {
-            const [rows] = await connection.query(
+            const [subscriptionListDTO] = await connection.query<SubscriptionListDTO[] & RowDataPacket[]>(
                 `SELECT
                 sub.id,
                 sub.customerId,
@@ -79,16 +81,16 @@ export class SubscriptionDAO {
                 JOIN customers c ON sub.customerId = c.id 
                 JOIN plans p ON sub.planId = p.id
                 WHERE sub.customerId = ?`, [customerId]);
-            return rows.map((row: any) => this.mapRowToSubscription(row));
+            return subscriptionListDTO;
         } catch (error) {
             console.error('Error searching subscriptions by customer ID:', error);
             throw new Error('Failed to search subscriptions by customer ID');
         }
     }
 
-    async searchByPlanId(planId: string): Promise<Subscription[]> {
+    async searchByPlanId(planId: string): Promise<SubscriptionListDTO[]> {
         try {
-            const [rows] = await connection.query(
+            const [subscriptionListDTO] = await connection.query<SubscriptionListDTO[] & RowDataPacket[]>(
                 `SELECT
                 sub.id,
                 sub.customerId,
@@ -100,7 +102,7 @@ export class SubscriptionDAO {
                 JOIN customers c ON sub.customerId = c.id 
                 JOIN plans p ON sub.planId = p.id
                 WHERE sub.planId = ?`, [planId]);
-            return rows.map((row: any) => this.mapRowToSubscription(row));
+            return subscriptionListDTO;
         } catch (error) {
             console.error('Error searching subscriptions by plan ID:', error);
             throw new Error('Failed to search subscriptions by plan ID');
@@ -163,23 +165,23 @@ export class SubscriptionDAO {
         });
     }
 
-    private mapRowToSubscription(row: any) {// CONSERTAR TIPAGEM
-        const customer = {
-            id: row.customerId,
-            name: row.customer_Name
-        };
-        const plan = {
-            id: row.planId,
-            name: row.plan_Name
-        };
-        return {
-            id: row.id,
-            customerId: row.customerId,
-            customer,
-            planId: row.planId,
-            plan,
-            startDate: row.startDate,
-            state: row.state
-        };
-    }
+    // private mapRowToSubscription(row: any) {// CONSERTAR TIPAGEM
+    //     const customer = {
+    //         id: row.customerId,
+    //         name: row.customer_Name
+    //     };
+    //     const plan = {
+    //         id: row.planId,
+    //         name: row.plan_Name
+    //     };
+    //     return {
+    //         id: row.id,
+    //         customerId: row.customerId,
+    //         customer,
+    //         planId: row.planId,
+    //         plan,
+    //         startDate: row.startDate,
+    //         state: row.state
+    //     };
+    // }
 }

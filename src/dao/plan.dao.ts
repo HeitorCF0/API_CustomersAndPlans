@@ -5,7 +5,7 @@ export class PlanDAO {
     async create(plan: Plan): Promise<void> {
         try {
             const [result] = await connection.query(
-                'INSERT INTO plans (id, name, description, price, type, createdAt) VALUES (?, ?, ?, ?, ?, ?)', 
+                `INSERT INTO plans (id, name, description, price, type, createdAt) VALUES (?, ?, ?, ?, ?, ?)`,
                 [plan.id, plan.name, plan.description, plan.price, plan.type, plan.createdAt]
             );
         } catch (error) {
@@ -16,8 +16,14 @@ export class PlanDAO {
 
     async searchAll(): Promise<Plan[]> {
         try {
-            const [rows] = await connection.query('SELECT * FROM plans');
-            return rows.map((row: any) => {return {id: row.id, name: row.name, price: row.price, type: row.type}});
+            const [plans] = await connection.query(
+                `SELECT plan.id, 
+                plan.name, 
+                plan.price, 
+                plan.type 
+                FROM plans`
+            );
+            return plans.map((plan: any) => {return {id: plan.id, name: plan.name, price: plan.price, type: plan.type}});
         } catch (error) {
             console.error('Error searching plans:', error);
             throw new Error('Failed to search plans');
@@ -34,6 +40,16 @@ export class PlanDAO {
         } catch (error) {
             console.error('Error searching plan by ID:', error);
             throw new Error('Failed to search plan by ID');
+        }
+    }
+
+    async searchByType(type: string): Promise<Plan[]> {
+        try {
+            const [rows] = await connection.query('SELECT * FROM plans WHERE type = ?', [type]);
+            return rows.map((row: any) => Plan.reconstruct(row));
+        } catch (error) {
+            console.error('Error searching plan by type:', error);
+            throw new Error('Failed to search plan by type');
         }
     }
 

@@ -5,7 +5,7 @@ export class UserDAO {
     async create(user: User): Promise<void> {
         try {
             const [result] = await connection.query(
-                'INSERT INTO users (id, name, email, password, role, createdAt) VALUES (?, ?, ?, ?, ?, ?)', 
+                `INSERT INTO users (id, name, email, password, role, createdAt) VALUES (?, ?, ?, ?, ?, ?)`,
                 [user.id, user.name, user.email, user.password, user.role, user.createdAt]
             );
         } catch (error) {
@@ -42,7 +42,7 @@ export class UserDAO {
     async update(user: User): Promise<void> {
         try{
             const [result] = await connection.query(
-                'UPDATE users SET name = ?, email = ?, password = ?, role = ? WHERE id = ?', [user.name, user.email, user.password, user.role, user.id]
+                `UPDATE users SET name = ?, email = ?, password = ?, role = ? WHERE id = ?`, [user.name, user.email, user.password, user.role, user.id]
             );
             if (result.affectedRows === 0) {
                 throw new Error('User not found');

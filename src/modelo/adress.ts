@@ -3,6 +3,7 @@ import { Customer } from "./customer";
 export type propsAdress = {
     id: string;
     customerId: string;
+    customer?: Customer;
     number: string | null;
     street: string | null;
     neighborhood: string | null;
