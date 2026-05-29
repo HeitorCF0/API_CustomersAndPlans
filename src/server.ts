@@ -1,5 +1,6 @@
 import express, { type Request, type Response } from 'express';
 import mysql from 'mysql2/promise';
+import { UserControle } from './controle/user.controle';
 
 const app = express();
 
@@ -12,8 +13,21 @@ const connection = mysql.createPool({
   database: 'API_web',
 });
 
+app.post('/User', async (req: Request, res: Response) => {
+  const userControle = new UserControle();
+  await userControle.create(req, res);
+});
 
+app.get('/User', async (req: Request, res: Response) => {
+  const userControle = new UserControle();
+  await userControle.searchAll(req, res);
+});
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+app.get('/User/:id', async (req: Request, res: Response) => {
+  const userControle = new UserControle();
+  await userControle.searchById(req, res);
+});
+
+app.listen(8080, () => {
+  console.log('Server is running on port 8080');
 });

@@ -4,7 +4,7 @@ import { User } from '../modelo/user';
 export class UserDAO {
     async create(user: User): Promise<void> {
         try {
-            const [result] = await connection.query(
+            const [result]: any = await connection.query(
                 `INSERT INTO users (id, name, email, password, role, createdAt) VALUES (?, ?, ?, ?, ?, ?)`,
                 [user.id, user.name, user.email, user.password, user.role, user.createdAt]
             );
@@ -16,22 +16,22 @@ export class UserDAO {
 
     async searchAll(): Promise<User[]> {
         try {
-            const [rows] = await connection.query(
-                'SELECT id, name, role FROM users');
-            return rows.map((row: any) => {return {id: row.id, name: row.name, role: row.role}});
+            const [rows]: any = await connection.query(
+                'SELECT id, name, email, role FROM users');
+            return (rows as any[]).map((row: any) => User.reconstruct(row));
         } catch (error) {
             console.error('Error searching users:', error);
             throw new Error('Failed to search users');
         }
     }
 
-    async searchById(id: number): Promise<User | null> {
+    async searchById(id: string): Promise<User | null> {
         try {
-            const [rows] = await connection.query('SELECT id, name, email, role FROM users WHERE id = ?', [id]);
-            if (rows.length === 0) {
+            const [rows]: any = await connection.query('SELECT id, name, email, role FROM users WHERE id = ?', [id]);
+            if ((rows as any[]).length === 0) {
                 return null;
             }
-            const user = User.reconstruct(rows[0]);
+            const user = User.reconstruct((rows as any[])[0]);
             return user;
         } catch (error) {
             console.error('Error searching user by ID:', error);
@@ -41,10 +41,10 @@ export class UserDAO {
 
     async update(user: User): Promise<void> {
         try{
-            const [result] = await connection.query(
+            const [result]: any = await connection.query(
                 `UPDATE users SET name = ?, email = ?, password = ?, role = ? WHERE id = ?`, [user.name, user.email, user.password, user.role, user.id]
             );
-            if (result.affectedRows === 0) {
+            if ((result as any).affectedRows === 0) {
                 throw new Error('User not found');
             }
         } catch (error) {
@@ -55,8 +55,8 @@ export class UserDAO {
 
     async delete(id: number): Promise<void> {
         try{
-            const [result] = await connection.query('DELETE FROM users WHERE id = ?', [id]);
-            if (result.affectedRows === 0) {
+            const [result]: any = await connection.query('DELETE FROM users WHERE id = ?', [id]);
+            if ((result as any).affectedRows === 0) {
                 throw new Error('User not found');
             }
         } catch (error) {

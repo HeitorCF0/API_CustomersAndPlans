@@ -1,6 +1,15 @@
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsEnum } from 'class-validator';
+import { Type } from 'class-transformer';
+import { customerStatus } from '../modelo/customer';
 
 export class custumersListDTO {
+    id: string;
+    name: string;
+    createdAt: string;
+    status: string;
+}
+
+export class createCustomerDTO {
     @IsNotEmpty()
     @IsString()
     id: string;
@@ -10,10 +19,10 @@ export class custumersListDTO {
     name: string;
 
     @IsNotEmpty()
-    @IsString()
-    createdAt: string;
-    
+    @Type(() => Date)
+    createdAt: Date;
+
     @IsNotEmpty()
-    @IsString()
-    status: string;
+    @IsEnum(customerStatus)
+    status: customerStatus;
 }

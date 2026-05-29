@@ -1,6 +1,12 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
 export class EmailListDTO {
+    email: string;
+    customerId: string;
+    costumerName: string;
+}
+
+export class CreateEmailDTO {
     @IsNotEmpty()
     @IsString()
     email: string;
@@ -12,5 +18,4 @@ export class EmailListDTO {
     @IsNotEmpty()
     @IsString()
     costumerName: string;
-    
 }

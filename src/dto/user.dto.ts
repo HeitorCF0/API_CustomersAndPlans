@@ -1,10 +1,7 @@
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { UserRole } from '../modelo/user';
 
 export class UserDTO {
-    @IsNotEmpty()
-    @IsString()
-    id: string;
-
     @IsNotEmpty()
     @IsString()
     name: string;
@@ -18,10 +15,6 @@ export class UserDTO {
     password: string;
 
     @IsNotEmpty()
-    @IsString()
-    role: string;
-
-    @IsNotEmpty()
-    @IsString()
-    createdAt: string;
+    @IsEnum(UserRole)
+    role: UserRole;
 }
