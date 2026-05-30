@@ -1,5 +1,7 @@
-import { connection  } from '../util/connection';
+import { RowDataPacket } from "mysql2";
+import { connection } from '../util/connection';
 import { User } from '../modelo/user';
+import { UserSearchAllDTO, UserSearchByIdDTO, UserAllAtributes } from '../dto/user.dto';
 
 export class UserDAO {
     async create(user: User): Promise<void> {
@@ -14,25 +16,40 @@ export class UserDAO {
         }
     }
 
-    async searchAll(): Promise<User[]> {
+    async searchAll(): Promise<UserSearchAllDTO[] | null> {
         try {
-            const [rows]: any = await connection.query(
+            const [userDTO] = await connection.query<UserSearchAllDTO[] & RowDataPacket[]>(
                 'SELECT id, name, email, role FROM users');
-            return (rows as any[]).map((row: any) => User.reconstruct(row));
+            if (userDTO.length === 0){
+                return null
+            } 
+            return userDTO
         } catch (error) {
             console.error('Error searching users:', error);
             throw new Error('Failed to search users');
         }
     }
 
-    async searchById(id: string): Promise<User | null> {
+    async searchById(id: string): Promise<UserSearchByIdDTO[] | null> {
         try {
-            const [rows]: any = await connection.query('SELECT id, name, email, role FROM users WHERE id = ?', [id]);
-            if ((rows as any[]).length === 0) {
+            const [userDTO]: any = await connection.query('SELECT id, name, email, role, createdAt FROM users WHERE id = ?', [id]);
+            if (userDTO.length === 0) {
                 return null;
             }
-            const user = User.reconstruct((rows as any[])[0]);
-            return user;
+            return userDTO;
+        } catch (error) {
+            console.error('Error searching user by ID:', error);
+            throw new Error('Failed to search user by ID');
+        }
+    }
+
+    async updateSearchById(id: string): Promise<UserAllAtributes[] | null> {
+        try {
+            const [userDTO]: any = await connection.query('SELECT * FROM users WHERE id = ?', [id]);
+            if (userDTO.length === 0) {
+                return null;
+            }
+            return userDTO;
         } catch (error) {
             console.error('Error searching user by ID:', error);
             throw new Error('Failed to search user by ID');
@@ -44,7 +61,7 @@ export class UserDAO {
             const [result]: any = await connection.query(
                 `UPDATE users SET name = ?, email = ?, password = ?, role = ? WHERE id = ?`, [user.name, user.email, user.password, user.role, user.id]
             );
-            if ((result as any).affectedRows === 0) {
+            if (result.affectedRows === 0) {
                 throw new Error('User not found');
             }
         } catch (error) {
@@ -53,7 +70,7 @@ export class UserDAO {
         }
     }
 
-    async delete(id: number): Promise<void> {
+    async delete(id: string): Promise<void> {
         try{
             const [result]: any = await connection.query('DELETE FROM users WHERE id = ?', [id]);
             if ((result as any).affectedRows === 0) {

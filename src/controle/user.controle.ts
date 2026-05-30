@@ -1,55 +1,69 @@
 import { Request, Response } from 'express';
-import { User } from '../modelo/user';
-import { UserDAO } from '../dao/user.dao';
-import { UserDTO } from '../dto/user.dto';
+import { UserCreateDTO, UserUpdateDTO } from '../dto/user.dto';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
+import { UserService } from '../service/user.service';
 
 export class UserControle {
-    private userDAO: UserDAO;
+    private userService: UserService;
 
-    constructor() {
-        this.userDAO = new UserDAO();
+    constructor(userService: UserService) {
+        this.userService = userService;
     }
 
     public async create(req: Request, res: Response) {
         try {
-            const userDTO = plainToInstance(UserDTO, req.body);
-            const errors = await validate(userDTO);
+            const userCreateDTO = plainToInstance(UserCreateDTO, req.body);
+            const errors = await validate(userCreateDTO);
 
             if (errors.length > 0) {
                 return res.status(400).json({ errors });
             }
 
-            const user = User.construct(
-                userDTO.name, 
-                userDTO.email, 
-                userDTO.password,
-                userDTO.role
-            );
-            await this.userDAO.create(user);
+            await this.userService.create(userCreateDTO);
             res.status(201).json({ message: 'User created successfully'});
-        } catch (error) {
-            res.status(500).json({ error: 'Error creating user' });
+        } catch (error: any) {
+            console.error('Error creating user:', error);
+            res.status(500).json({ error: error.message || 'Error creating user' });
         }
     }
 
-    public async searchAll(req: Request, res: Response) {
+    public async searchAll(req: Request, res:Response){
+        const userDTO = await this.userService.searchAll()
+        res.status(200).json(userDTO).send()
+    }
+
+    public async searchById(req: Request, res:Response){
+        const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+
+        const userDTO = await this.userService.searchById(id);
+        res.status(200).json(userDTO).send();
+    }
+
+    public async update(req: Request, res: Response) {
         try {
-            const users = await this.userDAO.searchAll();
-            res.status(200).json({ data: users, message: 'Users retrieved successfully' });
-        } catch (error) {
-            res.status(500).json({ error: 'Error retrieving users' });
+            const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+            const userUpdateDTO = plainToInstance(UserUpdateDTO, req.body);
+            const errors = await validate(userUpdateDTO);
+
+            if (errors.length > 0) {
+                return res.status(400).json({ errors });
+            }
+
+            await this.userService.update(id, userUpdateDTO);
+            res.status(200).json({ message: 'User updated successfully' });
+        } catch (error: any) {
+            console.error('Error updating user:', error);
+            if (error.message === 'User not found') {
+                return res.status(404).json({ error: 'User not found' });
+            }
+            res.status(500).json({ error: error.message || 'Error updating user' });
         }
     }
 
-    public async searchById(req: Request, res: Response){
-        try{
-            const id = req.params.id.toString()
-            const user = await this.userDAO.searchById(id);
-            res.status(200).json({ data: user, message: 'Users retrieved successfully' });
-        }catch (error) {
-            res.status(500).json({ error: 'Error retrieving user'})
-        }
+    public async delete(req: Request, res: Response) {
+        const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+        await this.userService.delete(id);
+        res.status(200).json({ message:'User deleted successfully' });
     }
 }

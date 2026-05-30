@@ -1,3 +1,5 @@
+import { UserCreateDTO, UserUpdateDTO } from "../dto/user.dto";
+
 export enum UserRole {
     Admin = 'ADMIN',
     Worker = 'WORKER'
@@ -15,7 +17,7 @@ export type propsUser = {
 export class User {
     constructor(private props: propsUser) {}
 
-    public static construct(name: string, email: string, password: string, role: UserRole) {
+    public static construct({name, email, password, role}: UserCreateDTO) {
         if (!name || !email || !password || !role) {
             throw new Error("All fields are required");
         }
@@ -32,6 +34,13 @@ export class User {
 
     public static reconstruct(props: propsUser) {
         return new User(props);
+    }
+
+    public update(updateDTO: UserUpdateDTO) {
+        if (updateDTO.name !== undefined) this.props.name = updateDTO.name;
+        if (updateDTO.email !== undefined) this.props.email = updateDTO.email;
+        if (updateDTO.password !== undefined) this.props.password = updateDTO.password;
+        if (updateDTO.role !== undefined) this.props.role = updateDTO.role;
     }
 
     public get id(){
