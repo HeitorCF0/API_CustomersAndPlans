@@ -1,5 +1,7 @@
-import { Customer } from "../modelo/customer";
+import { RowDataPacket } from "mysql2";
+import { Customer } from "../model/customer";
 import { connection } from "../util/connection";
+import { CustomersListDTO, CustomerUpdateDTO } from '../dto/customer.dto'
 
 export class CustomerDAO {
     async create(customer: Customer): Promise<void> {
@@ -14,17 +16,20 @@ export class CustomerDAO {
         }
     }
 
-    async searchAll(): Promise<Customer[]> {
+    async searchAll(): Promise<CustomersListDTO[] | null> {
         try {
-            const [rows] = await connection.query('SELECT id, name, createdAt FROM customers');
-            return rows.map((row: any) => {return {id: row.id, name: row.name, createdAt: row.createdAt}});
+            const [customerDTO] = await connection.query<CustomersListDTO[] & RowDataPacket[]>('SELECT id, name, status FROM customers');
+            if (customerDTO.length === 0) {
+                return null
+            }
+            return customerDTO
         } catch (error) {
             console.error('Error searching customers:', error);
             throw new Error('Failed to search customers');
         }
     }
 
-    async searchById(id: number): Promise<Customer | null> {
+    async searchById(id: string): Promise<Customer | null> {//implementar quando fizer o crud de email, phone e adress
         try {
             const [rows] = await connection.query('SELECT * FROM customers WHERE id = ?', [id]);
             if (rows.length === 0) {
@@ -38,10 +43,10 @@ export class CustomerDAO {
         }
     }
 
-    async update(customer: Customer): Promise<void> {
+    async update(id:string, customerUpdateDTO: CustomerUpdateDTO): Promise<void> {
         try{
-            const [result] = await connection.query(
-                'UPDATE customers SET name = ?, status = ? WHERE id = ?', [customer.name, customer.status, customer.id]);
+            const [result]: any = await connection.query(
+                'UPDATE customers SET name = ?, status = ? WHERE id = ?', [customerUpdateDTO.name, customerUpdateDTO.status, id]);
             if (result.affectedRows === 0) {
                 throw new Error('Customer not found');
             }
@@ -51,7 +56,20 @@ export class CustomerDAO {
         }
     }
 
-    async delete(id: number): Promise<void> {
+    async updateSearchById(id: string): Promise<CustomerUpdateDTO[] | null> {
+        try {
+            const [userDTO]: any = await connection.query('SELECT name, status FROM customers WHERE id = ?', [id]);
+            if (userDTO.length === 0) {
+                return null;
+            }
+            return userDTO;
+        } catch (error) {
+            console.error('Error searching user by ID:', error);
+            throw new Error('Failed to search user by ID');
+        }
+    }
+
+    async delete(id: number): Promise<void> {//unfinished
         try{
             const [result] = await connection.query('DELETE FROM customers WHERE id = ?', [id]);
             if (result.affectedRows === 0) {

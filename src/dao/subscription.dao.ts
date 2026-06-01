@@ -1,7 +1,7 @@
-import { Subscription } from "../modelo/subscription";
+import { Subscription } from "../model/subscription";
 import { connection } from "../util/connection";
-import { Customer } from "../modelo/customer";
-import { Plan } from "../modelo/plan";
+import { Customer } from "../model/customer";
+import { Plan } from "../model/plan";
 import { SubscriptionListDTO } from "../dto/subscription.dto";
 import { RowDataPacket } from "mysql2";
 

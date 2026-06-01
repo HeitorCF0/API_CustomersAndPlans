@@ -1,5 +1,5 @@
 import { InstallmentListByIdDTO, InstallmentListDTO } from "../dto/installment.dto";
-import { Installment } from "../modelo/installment";
+import { Installment } from "../model/installment";
 import { connection } from "../util/connection";
 import { RowDataPacket } from "mysql2";
 

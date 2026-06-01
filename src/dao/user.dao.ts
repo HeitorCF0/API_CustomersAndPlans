@@ -1,6 +1,6 @@
 import { RowDataPacket } from "mysql2";
 import { connection } from '../util/connection';
-import { User } from '../modelo/user';
+import { User } from '../model/user';
 import { UserSearchAllDTO, UserSearchByIdDTO, UserAllAtributes } from '../dto/user.dto';
 
 export class UserDAO {

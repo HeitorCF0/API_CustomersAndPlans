@@ -1,28 +1,26 @@
-import { IsNotEmpty, IsString, IsEnum } from 'class-validator';
+import { IsNotEmpty, IsString, IsEnum, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
-import { customerStatus } from '../modelo/customer';
+import { customerStatus } from '../model/customer';
 
-export class custumersListDTO {
+
+export class CustomersListDTO {
     id: string;
     name: string;
-    createdAt: string;
     status: string;
 }
 
-export class createCustomerDTO {
-    @IsNotEmpty()
-    @IsString()
-    id: string;
-
+export class CustomerCreateDTO {
     @IsNotEmpty()
     @IsString()
     name: string;
+}
 
-    @IsNotEmpty()
-    @Type(() => Date)
-    createdAt: Date;
+export class CustomerUpdateDTO {
+    @IsOptional()
+    @IsString()
+    name?: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsEnum(customerStatus)
-    status: customerStatus;
+    status?: string;
 }

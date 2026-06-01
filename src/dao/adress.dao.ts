@@ -1,8 +1,8 @@
-import { Adress } from "../modelo/adress";
+import { Adress } from "../model/adress";
 import { connection } from "../util/connection";
 import { AdressListDTO } from "../dto/adress.dto";
 import { RowDataPacket } from "mysql2";
-import { Customer } from "../modelo/customer";
+import { Customer } from "../model/customer";
 
 export class AdressDAO {
     async create(adress: Adress): Promise<void> {

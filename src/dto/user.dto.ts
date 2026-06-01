@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString, IsEmail, IsOptional } from 'class-validator';
-import { UserRole } from '../modelo/user';
+import { UserRole } from '../model/user';
 
 export class UserAllAtributes{
     id: string;

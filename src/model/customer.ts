@@ -1,3 +1,5 @@
+import { CustomerCreateDTO } from "../dto/customer.dto";
+
 export enum customerStatus {
     Active = 'ACTIVE',
     Inactive = 'INACTIVE'
@@ -13,7 +15,7 @@ export type propsCustomer = {
 export class Customer {
     constructor(private props: propsCustomer) {}
 
-    public static construct(name: string) {
+    public static construct({name}: CustomerCreateDTO) {
         if (!name) {throw new Error("Name field is required");}
         const props: propsCustomer = {
             id: crypto.randomUUID().toString(),

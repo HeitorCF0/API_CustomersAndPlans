@@ -1,4 +1,4 @@
-import { Plan } from "../modelo/plan";
+import { Plan } from "../model/plan";
 import { connection } from "../util/connection";
 
 export class PlanDAO {

@@ -1,4 +1,4 @@
-import { Payment } from "../modelo/payment";
+import { Payment } from "../model/payment";
 import { connection } from "../util/connection";
 import { RowDataPacket } from "mysql2";
 import { PaymentListByIdDTO, PaymentListDTO } from "../dto/payment.dto";

@@ -1,8 +1,8 @@
-import { Phone } from '../modelo/phone';
+import { Phone } from '../model/phone';
 import { connection } from '../util/connection';
 import { PhoneListDTO } from '../dto/phone.dto';
 import { RowDataPacket } from 'mysql2';
-import { Customer } from '../modelo/customer';
+import { Customer } from '../model/customer';
 
 export class PhoneDAO {
     async create(phone: Phone): Promise<void> {

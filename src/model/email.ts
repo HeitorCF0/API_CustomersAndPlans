@@ -1,3 +1,4 @@
+import { EmailCreateDTO } from "../dto/email.dto";
 import { Customer } from "./customer";
 
 export type propsEmail = {
@@ -9,9 +10,7 @@ export type propsEmail = {
 export class Email{
     constructor(private props: propsEmail) {}
 
-    public static construct(
-        customerId: string,
-        email: string,
+    public static construct({ customerId, email }: EmailCreateDTO
     ) {
         if(!customerId){throw new Error("Invalid customer")}
         if(!email){throw new Error("Email field is required");}

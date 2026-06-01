@@ -1,6 +1,6 @@
 import { UserDAO } from '../dao/user.dao'
 import { UserCreateDTO, UserUpdateDTO, UserSearchAllDTO, UserSearchByIdDTO } from '../dto/user.dto'
-import { User } from '../modelo/user'
+import { User } from '../model/user'
 
 export class UserService {
     public constructor (private readonly userDAO: UserDAO) {}

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class EmailListDTO {
     email: string;
@@ -6,16 +6,18 @@ export class EmailListDTO {
     costumerName: string;
 }
 
-export class CreateEmailDTO {
+export class EmailCreateDTO {
     @IsNotEmpty()
-    @IsString()
+    @IsEmail()
     email: string;
 
     @IsNotEmpty()
     @IsString()
     customerId: string;
+}
 
+export class EmailUpdateDTO {
     @IsNotEmpty()
-    @IsString()
-    costumerName: string;
+    @IsEmail()
+    email: string;
 }

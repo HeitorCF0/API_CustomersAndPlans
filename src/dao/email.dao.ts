@@ -1,8 +1,8 @@
-import { Email } from "../modelo/email";
+import { Email } from "../model/email";
 import { connection } from "../util/connection";
-import { EmailListDTO } from "../dto/email.dto";
+import { EmailListDTO, EmailUpdateDTO } from "../dto/email.dto";
 import { RowDataPacket } from "mysql2";
-import { Customer } from "../modelo/customer";
+import { Customer } from "../model/customer";
 
 export class EmailDAO {
     async create(email: Email): Promise<void> {
@@ -25,8 +25,8 @@ export class EmailDAO {
                 c.name as customerName, 
                 e.email 
                 FROM emails e
-                JOIN costumers c 
-                ON e.customersID = c.id`);
+                JOIN customers c 
+                ON e.customerId = c.id`);
             return emailListDTO;
         } catch (error) {
             console.error('Error searching emails:', error);
@@ -76,9 +76,9 @@ export class EmailDAO {
         }
     }
 
-    async update(email: Email): Promise<void> {
+    async update(id: string, newEmail: EmailUpdateDTO): Promise<void> {
         try{
-            const [result] = await connection.query('UPDATE emails SET email = ? WHERE id = ?', [email.email, email.id]);
+            const [result] = await connection.query('UPDATE emails SET email = ? WHERE id = ?', [newEmail.email, id]);
             if (result.affectedRows === 0) {
                 throw new Error('Email not found');
             }

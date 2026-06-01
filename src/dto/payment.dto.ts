@@ -1,6 +1,6 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, IsEnum } from "class-validator";
 import { Type } from "class-transformer";
-import { Installment } from "../modelo/installment";
+import { Installment } from "../model/installment";
 
 export class PaymentListDTO {
     id: string;
