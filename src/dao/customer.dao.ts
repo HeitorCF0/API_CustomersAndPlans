@@ -29,14 +29,61 @@ export class CustomerDAO {
         }
     }
 
-    async searchById(id: string): Promise<Customer | null> {//implementar quando fizer o crud de email, phone e adress
+    // async searchById(id: string) {//implementar quando fizer o crud de email, phone e adress
+    //     try {
+    //         const [rows] = await connection.query(`
+    //             SELECT 
+    //             c.*, 
+    //             e.id as emailId, 
+    //             e.email, 
+    //             p.id as phoneId,
+    //             p.phone,
+    //             a.id as addressId,
+    //             a.street,
+    //             a.number,
+    //             a.neighborhood,
+    //             a.city,
+    //             a.state,
+    //             a.cep,
+    //             a.complement
+    //             FROM customers c
+    //             JOIN emails e 
+    //             ON c.id = e.customerId 
+    //             LEFT JOIN phones p 
+    //             ON c.id = p.customerId 
+    //             LEFT JOIN adresses a 
+    //             ON c.id = a.customerId 
+    //             WHERE c.id = ? Group BY c.id`, [id]);
+    //         if (rows.length === 0) {
+    //             return null;
+    //         }
+    //         return rows;
+    //     } catch (error) {
+    //         console.error('Error searching customer by ID:', error);
+    //         throw new Error('Failed to search customer by ID');
+    //     }
+    // }
+
+    async searchById(id: string) {//implementar quando fizer o crud de email, phone e adress
         try {
-            const [rows] = await connection.query('SELECT * FROM customers WHERE id = ?', [id]);
-            if (rows.length === 0) {
+            const [customer] : any = await connection.query(`
+                SELECT 
+                c.*
+                FROM customers c
+                WHERE c.id = ?`, [id]);
+            const email = await connection.query('SELECT id, email FROM emails WHERE customerId = ?', [id]);
+            const phone = await connection.query('SELECT id, phone FROM phones WHERE customerId = ?', [id]);
+            const address = await connection.query('SELECT id, street, number, neighborhood, city, state, cep, complement FROM adresses WHERE customerId = ?', [id]);
+            if (customer.length === 0) {
                 return null;
             }
-            const customer = Customer.reconstruct(rows[0]);
-            return customer;
+            const rows = {
+                customer,
+                email,
+                phone,
+                address
+            }
+            return rows;
         } catch (error) {
             console.error('Error searching customer by ID:', error);
             throw new Error('Failed to search customer by ID');
@@ -71,7 +118,7 @@ export class CustomerDAO {
 
     async delete(id: number): Promise<void> {//unfinished
         try{
-            const [result] = await connection.query('DELETE FROM customers WHERE id = ?', [id]);
+            const [result] : any = await connection.query('DELETE FROM customers WHERE id = ?', [id]);
             if (result.affectedRows === 0) {
                 throw new Error('Customer not found');
             }

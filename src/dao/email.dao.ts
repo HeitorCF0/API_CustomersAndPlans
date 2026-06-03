@@ -58,7 +58,7 @@ export class EmailDAO {
 
     async searchByClientId(clientId: string): Promise<Email | null> {
         try {
-            const [rows] = await connection.query(`
+            const [rows] : any = await connection.query(`
                 SELECT 
                 e.id, 
                 e.email, 
@@ -79,7 +79,7 @@ export class EmailDAO {
 
     async update(id: string, newEmail: EmailUpdateDTO): Promise<void> {
         try{
-            const [result] = await connection.query('UPDATE emails SET email = ? WHERE id = ?', [newEmail.email, id]);
+            const [result] : any = await connection.query('UPDATE emails SET email = ? WHERE id = ?', [newEmail.email, id]);
             if (result.affectedRows === 0) {
                 throw new Error('Email not found');
             }
@@ -91,7 +91,7 @@ export class EmailDAO {
 
     async delete(id: string): Promise<void> {
         try{
-            const [result] = await connection.query('DELETE FROM emails WHERE id = ?', [id]);
+            const [result] : any = await connection.query('DELETE FROM emails WHERE id = ?', [id]);
             if (result.affectedRows === 0) {
                 throw new Error('Email not found');
             }
@@ -103,7 +103,7 @@ export class EmailDAO {
 
     async deleteByClientId(clientId: string): Promise<void> {
         try{
-            const [result] = await connection.query('DELETE FROM emails WHERE customerId = ?', [clientId]);
+            const [result] : any = await connection.query('DELETE FROM emails WHERE customerId = ?', [clientId]);
             if (result.affectedRows === 0) {
                 throw new Error('Email not found');
             }

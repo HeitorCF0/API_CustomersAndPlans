@@ -37,7 +37,7 @@ export class PhoneDAO {
 
     async searchById(id: string): Promise<Phone | null> {
         try {
-            const [rows] = await connection.query(`
+            const [rows] : any = await connection.query(`
                 SELECT 
                 p.id, 
                 p.phone, 
@@ -68,7 +68,7 @@ export class PhoneDAO {
 
     async update(id:string, newPhone: PhoneUpdateDTO): Promise<void> {
         try{
-            const [result] = await connection.query('UPDATE phones SET phone = ? WHERE id = ?', [newPhone.phone, id]);
+            const [result] : any = await connection.query('UPDATE phones SET phone = ? WHERE id = ?', [newPhone.phone, id]);
             if (result.affectedRows === 0) {
                 throw new Error('Phone not found');
             }
@@ -80,7 +80,7 @@ export class PhoneDAO {
 
     async delete(id: string): Promise<void> {
         try{
-            const [result] = await connection.query('DELETE FROM phones WHERE id = ?', [id]);
+            const [result] : any = await connection.query('DELETE FROM phones WHERE id = ?', [id]);
             if (result.affectedRows === 0) {
                 throw new Error('Phone not found');
             }
@@ -92,7 +92,7 @@ export class PhoneDAO {
 
     async deleteByClientId(clientId: string): Promise<void> {
         try{
-            const [result] = await connection.query('DELETE FROM phones WHERE customerId = ?', [clientId]);
+            const [result] : any = await connection.query('DELETE FROM phones WHERE customerId = ?', [clientId]);
             if (result.affectedRows === 0) {
                 throw new Error('Phones not found for the client');
             }

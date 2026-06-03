@@ -1,5 +1,5 @@
 import { CustomerDAO } from '../dao/customer.dao'
-import { CustomerCreateDTO, CustomersListDTO, CustomerUpdateDTO } from '../dto/customer.dto'
+import { CustomerCreateDTO, CustomerSearchByIdDTO, CustomersListDTO, CustomerUpdateDTO } from '../dto/customer.dto'
 import { Customer } from '../model/customer';
 
 export class CustomerService {
@@ -21,6 +21,15 @@ export class CustomerService {
             return customerDTO
         }
         return null
+    }
+
+    public async searchById(id: string) {
+        const customerInfo = await this.customerDAO.searchById(id);
+        if (customerInfo) {
+            const customer = [customerInfo.customer, customerInfo.email[0], customerInfo.phone[0], customerInfo.address[0]]
+            return customer;
+        }
+        return null;
     }
 
     public async update(id: string, customerUpdateDTO: CustomerUpdateDTO) {

@@ -39,7 +39,7 @@ export class AddressDAO {
 
     async searchById(id: string): Promise<Address | null> {
         try {
-            const [rows] = await connection.query('SELECT * FROM adresses WHERE id = ?', [id]);
+            const [rows] : any = await connection.query('SELECT * FROM adresses WHERE id = ?', [id]);
             if (rows.length === 0) {
                 return null;
             }
@@ -52,7 +52,7 @@ export class AddressDAO {
 
     async searchByClientId(clientId: string): Promise<Address | null> {
         try {
-            const [rows] = await connection.query('SELECT * FROM adresses WHERE clientId = ?', [clientId]);
+            const [rows] : any = await connection.query('SELECT * FROM adresses WHERE clientId = ?', [clientId]);
             return rows.length > 0 ? this.mapAdress(rows[0]) : null;
         } catch (error) {
             console.error('Error searching adresses by client ID:', error);
@@ -74,7 +74,7 @@ export class AddressDAO {
 
     async delete(id: string): Promise<void> {
         try{
-            const [result] = await connection.query('DELETE FROM adresses WHERE id = ?', [id]);
+            const [result] : any = await connection.query('DELETE FROM adresses WHERE id = ?', [id]);
             if (result.affectedRows === 0) {
                 throw new Error('Adress not found');
             }
@@ -86,7 +86,7 @@ export class AddressDAO {
 
     async deleteByClientId(clientId: string): Promise<void> {
         try{
-            const [result] = await connection.query('DELETE FROM adresses WHERE clientId = ?', [clientId]);
+            const [result] : any = await connection.query('DELETE FROM adresses WHERE clientId = ?', [clientId]);
             if (result.affectedRows === 0) {
                 throw new Error('Adresses not found for the given client ID');
             }
