@@ -1,15 +1,23 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class PhoneListDTO {
+export class PhoneCreateDTO {
     @IsNotEmpty()
     @IsString()
-    id: string;
+    customerId: string;
 
     @IsNotEmpty()
     @IsString()
     phone: string;
+}
 
+export class PhoneListDTO{
+    phone: string;
+    customerId: string;
+    customerName: string;
+}
+
+export class PhoneUpdateDTO {
     @IsNotEmpty()
     @IsString()
-    customerName: string;
+    phone: string;
 }

@@ -1,33 +1,35 @@
 import { Customer } from "./customer";
 
-export type propsAdress = {
+import { AddressCreateDTO } from "../dto/address.dto";
+
+export type propsAddress = {
     id: string;
     customerId: string;
     customer?: Customer;
-    number: string | null;
-    street: string | null;
-    neighborhood: string | null;
+    number: string | undefined;
+    street: string | undefined;
+    neighborhood: string | undefined;
     city: string;
     state: string;
-    complement: string | null;
-    cep: string | null;
+    complement: string | undefined;
+    cep: string | undefined;
 }
 
-export class Adress{
+export class Address{
     private constructor(
-        private props: propsAdress
+        private props: propsAddress
     ) {}
 
-    public static construct(
-        customerId: string, 
-        street: string | null, 
-        number: string | null, 
-        neighborhood: string | null, 
-        city: string, 
-        state: string, 
-        cep: string | null, 
-        complement: string | null
-    ) {
+    public static construct({
+        customerId, 
+        street, 
+        number, 
+        neighborhood, 
+        city, 
+        state, 
+        cep, 
+        complement
+    }: AddressCreateDTO) {
         if(!customerId){
             throw new Error("Invalid customerId");
         }
@@ -35,7 +37,7 @@ export class Adress{
             throw new Error("City and state are required");
         }
         const id = crypto.randomUUID().toString();
-        const props: propsAdress = {
+        const props: propsAddress = {
             id,
             customerId,
             street,
@@ -46,13 +48,13 @@ export class Adress{
             complement,
             cep
         };
-        return new Adress(props);
+        return new Address(props);
     }
 
     public static reconstruct(
-        props: propsAdress
+        props: propsAddress
     ) {
-        return new Adress(props);
+        return new Address(props);
     }
 
     public get id(){

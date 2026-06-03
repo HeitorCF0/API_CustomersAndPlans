@@ -1,54 +1,56 @@
-import { Adress } from "../model/adress";
+import { Address } from "../model/address";
 import { connection } from "../util/connection";
-import { AdressListDTO } from "../dto/adress.dto";
+import { AddressCreateDTO, AddressListDTO, AddressUpdateDTO } from "../dto/address.dto";
 import { RowDataPacket } from "mysql2";
 import { Customer } from "../model/customer";
 
-export class AdressDAO {
-    async create(adress: Adress): Promise<void> {
+export class AddressDAO {
+    async create(address: Address): Promise<void> {
         try {
             const [result] = await connection.query(
-                'INSERT INTO adresses (id, clientId, street, number, neighborhood, city, state, cep, complement) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [
-                    adress.id, 
-                    adress.customerId, 
-                    adress.street, 
-                    adress.number, 
-                    adress.neighborhood, 
-                    adress.city, 
-                    adress.state, 
-                    adress.cep, 
-                    adress.complement]
+                'INSERT INTO adresses (id, customerId, street, number, neighborhood, city, state, cep, complement) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+                    address.id, 
+                    address.customerId, 
+                    address.street, 
+                    address.number, 
+                    address.neighborhood, 
+                    address.city, 
+                    address.state, 
+                    address.cep, 
+                    address.complement]
             );
         } catch (error) {
-            console.error('Error creating adress:', error);
-            throw new Error('Failed to create adress');
+            console.error('Error creating address:', error);
+            throw new Error('Failed to create address');
         }
     }
 
-    async searchAll(): Promise<AdressListDTO[]> {
+    async searchAll(): Promise<AddressListDTO[]> {
         try {
-            const [adressListDTO] = await connection.query<AdressListDTO[] & RowDataPacket[]>('SELECT a.*, c.customerName FROM adresses JOIN customers c');
+            const [adressListDTO] = await connection.query<AddressListDTO[] & RowDataPacket[]>(
+                `SELECT a.*, c.name as customerName FROM adresses a JOIN customers c ON a.customerId = c.id`
+                );
             return adressListDTO;
         } catch (error) {
-            console.error('Error searching adresses by customer ID:', error);
-            throw new Error('Failed to search adresses by customer ID');
+            console.error('Error searching adresses:', error);
+            throw new Error('Failed to search adresses');
         }
     }
 
-    async searchById(id: string): Promise<Adress | null> {
+    async searchById(id: string): Promise<Address | null> {
         try {
             const [rows] = await connection.query('SELECT * FROM adresses WHERE id = ?', [id]);
             if (rows.length === 0) {
                 return null;
             }
-            return Adress.reconstruct(rows[0]);
+            return Address.reconstruct(rows[0]);
         } catch (error) {
             console.error('Error searching adress by ID:', error);
             throw new Error('Failed to search adress by ID');
         }
     }
 
-    async searchByClientId(clientId: string): Promise<Adress | null> {
+    async searchByClientId(clientId: string): Promise<Address | null> {
         try {
             const [rows] = await connection.query('SELECT * FROM adresses WHERE clientId = ?', [clientId]);
             return rows.length > 0 ? this.mapAdress(rows[0]) : null;
@@ -58,11 +60,11 @@ export class AdressDAO {
         }
     }
 
-    async update(adress: Adress): Promise<void> {
+    async update(id: string, newAddress: AddressUpdateDTO): Promise<void> {
         try{
             const [result] = await connection.query(
                 'UPDATE adresses SET street = ?, number = ?, neighborhood = ?, city = ?, state = ?, cep = ?, complement = ? WHERE id = ?',
-                [adress.street, adress.number, adress.neighborhood, adress.city, adress.state, adress.cep, adress.complement, adress.id]
+                [newAddress.street, newAddress.number, newAddress.neighborhood, newAddress.city, newAddress.state, newAddress.cep, newAddress.complement, id]
             );
         } catch (error) {
             console.error('Error updating adress:', error);
@@ -94,8 +96,22 @@ export class AdressDAO {
         }
     }
 
-    private mapAdress(row: any) : Adress {
-        const phone = Adress.reconstruct({
+    async updateSearchById(id: string): Promise<AddressUpdateDTO[] | null> {
+        try {
+            const [addressDTO]: any = await connection.query('SELECT street, number, neighborhood, city, state, cep, complement FROM adresses WHERE id = ?', [id]);
+            if (addressDTO.length === 0) {
+                return null;
+            }
+            return addressDTO;
+        } catch (error) {
+            console.error('Error searching address by ID:', error);
+            throw new Error('Failed to search address by ID');
+        }
+    }
+
+
+    private mapAdress(row: any) : Address {
+        const phone = Address.reconstruct({
             id: row.id, 
             customerId: row.customerId, 
             street: row.street, 
@@ -112,7 +128,7 @@ export class AdressDAO {
             createdAt: row.customerCreatedAt,
             status: row.customerStatus
         });
-        return Adress.reconstruct({
+        return Address.reconstruct({
             id: row.id, 
             customerId: row.customerId, 
             customer,

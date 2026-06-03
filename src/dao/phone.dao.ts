@@ -1,6 +1,6 @@
 import { Phone } from '../model/phone';
 import { connection } from '../util/connection';
-import { PhoneListDTO } from '../dto/phone.dto';
+import { PhoneListDTO, PhoneUpdateDTO } from '../dto/phone.dto';
 import { RowDataPacket } from 'mysql2';
 import { Customer } from '../model/customer';
 
@@ -22,7 +22,8 @@ export class PhoneDAO {
             const [phoneListDTO] = await connection.query<PhoneListDTO[] & RowDataPacket[]>(`
                 SELECT 
                 p.id, 
-                p.phone, 
+                p.phone,
+                c.id as customerId, 
                 c.name as customerName 
                 FROM phones p 
                 JOIN customers c 
@@ -65,9 +66,9 @@ export class PhoneDAO {
         }
     }
 
-    async update(phone: Phone): Promise<void> {
+    async update(id:string, newPhone: PhoneUpdateDTO): Promise<void> {
         try{
-            const [result] = await connection.query('UPDATE phones SET phone = ? WHERE id = ?', [phone.phone, phone.id]);
+            const [result] = await connection.query('UPDATE phones SET phone = ? WHERE id = ?', [newPhone.phone, id]);
             if (result.affectedRows === 0) {
                 throw new Error('Phone not found');
             }
@@ -99,25 +100,5 @@ export class PhoneDAO {
             console.error('Error deleting phones by client ID:', error);
             throw new Error('Failed to delete phones by client ID');
         }
-    }
-
-    private mapPhone(row: any) : Phone {
-        const phone = Phone.reconstruct({
-            id: row.customerId,
-            phone: row.phone,
-            customerId: row.customerId
-        });
-        const customer = Customer.reconstruct({
-            id: row.customerId,
-            name: row.customerName,
-            createdAt: row.customerCreatedAt,
-            status: row.customerStatus
-        });
-        return Phone.reconstruct({
-            id: row.id,
-            phone: row.phone,
-            customerId: row.customerId,
-            customer
-        });
     }
 }

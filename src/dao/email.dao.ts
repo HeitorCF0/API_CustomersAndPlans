@@ -22,8 +22,9 @@ export class EmailDAO {
             const [emailListDTO] = await connection.query<EmailListDTO[] & RowDataPacket[]>(`
                 SELECT 
                 e.id, 
-                c.name as customerName, 
-                e.email 
+                e.email, 
+                c.id as customerId,
+                c.name as customerName
                 FROM emails e
                 JOIN customers c 
                 ON e.customerId = c.id`);

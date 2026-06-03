@@ -1,3 +1,4 @@
+import { PhoneCreateDTO } from "../dto/phone.dto";
 import { Customer } from "./customer";
 
 export type propsPhone = {
@@ -11,7 +12,7 @@ export class Phone{
 
     constructor(private props: propsPhone) {}
 
-    public static construct(customerId: string, phone: string) {
+    public static construct({customerId, phone}: PhoneCreateDTO) {
         if(!customerId){throw new Error("Invalid customer")}
         if(!phone){throw new Error("Phone field is required");}
 
