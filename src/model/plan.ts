@@ -1,3 +1,5 @@
+import { PlanCreateDTO } from "../dto/plan.dto";
+
 export enum planType {
     Weekly = 'WEEKLY',
     Monthly = 'MONTHLY',
@@ -19,22 +21,27 @@ export type propsPlan = {
 export class Plan {
     constructor(private props: propsPlan) {}
 
-    public static construct(name: string, description: string | null, price: number, type: planType) {
-        if (!name) {throw new Error("Name fields is required");}
-        if (!price) {throw new Error("Price fields is required");}
-        if (!type) {throw new Error("Type fields is required");}
+    public static construct({
+        name,
+        description,
+        price,
+        type,
+    }: PlanCreateDTO)
 
+    {
+        const id = crypto.randomUUID().toString();
         const props: propsPlan = {
-            id: crypto.randomUUID().toString(),
+            id,
             name,
-            description,
+            description: description ?? null,
             price,
-            type,
+            type: type as planType,
             createdAt: new Date()
         }
         return new Plan(props);
     }
 
+    
     public static reconstruct(props: propsPlan) {
         return new Plan(props);
     }

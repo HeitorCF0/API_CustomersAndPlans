@@ -1,3 +1,4 @@
+import { PlanUpdateDTO } from "../dto/plan.dto";
 import { Plan } from "../model/plan";
 import { connection } from "../util/connection";
 
@@ -30,7 +31,7 @@ export class PlanDAO {
         }
     }
 
-    async searchById(id: number): Promise<Plan | null> {
+    async searchById(id: string): Promise<Plan | null> {
         try {
             const [rows] = await connection.query('SELECT * FROM plans WHERE id = ?', [id]);
             if (rows.length === 0) {
@@ -53,11 +54,25 @@ export class PlanDAO {
         }
     }
 
-    async update(plan: Plan): Promise<void> {
+    async updateSearchById(id: string): Promise<PlanUpdateDTO[] | null> {
+        try {
+            const [planDTO] = await connection.query('SELECT name, description, price, type FROM plans WHERE id = ?', [id])
+            if (planDTO.length === 0) {
+                return null;
+            }
+            return planDTO;
+        } catch (error) {
+            console.error('Error searching plan by ID for update:', error);
+            throw new Error('Failed to search plan by ID for update');
+        }
+    }
+
+
+    async update(id: string, newPlan: PlanUpdateDTO): Promise<void> {
         try{
             const [result] = await connection.query(
                 'UPDATE plans SET name = ?, description = ?, price = ?, type = ? WHERE id = ?',
-                [plan.name, plan.description, plan.price, plan.type, plan.id]
+                [newPlan.name, newPlan.description, newPlan.price, newPlan.type, id]
             );
         } catch (error) {
             console.error('Error updating plan:', error);
@@ -65,7 +80,8 @@ export class PlanDAO {
         }
     }
 
-    async delete(id: number): Promise<void> {
+
+    async delete(id: string): Promise<void> {
         try{
             const [result] = await connection.query('DELETE FROM plans WHERE id = ?', [id]);
             if (result.affectedRows === 0) {
