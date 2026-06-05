@@ -38,6 +38,17 @@ export class AddressControle{
         }
     }
 
+    public async searchByCustomerId(req: Request, res: Response) {
+        try {
+            const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+            const addressDTO = await this.addressService.searchByCustomerId(id);
+            res.status(200).json(addressDTO);
+        } catch (error: any) {
+            console.error('Error searching address:', error);
+            res.status(500).json({ error: error.message || 'Error searching address' });
+        }
+    }
+
     public async update (req: Request, res: Response) {
         try{
             const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;

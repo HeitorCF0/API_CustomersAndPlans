@@ -15,7 +15,7 @@ emailRoutes
 
 emailRoutes
     .route('/:id')
-    .get(async (req, res) => emailControle.searchById(req, res))
+    .get(async (req, res) => emailControle.searchByCustomerId(req, res))
     .put(async (req, res) => emailControle.update(req, res))
     .delete(async (req, res) => emailControle.delete(req, res))
 

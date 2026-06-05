@@ -1,5 +1,8 @@
 import { CustomerDAO } from '../dao/customer.dao'
-import { CustomerCreateDTO, CustomerSearchByIdDTO, CustomersListDTO, CustomerUpdateDTO } from '../dto/customer.dto'
+import { EmailDAO } from '../dao/email.dao';
+import { PhoneDAO } from '../dao/phone.dao';
+import { AddressDAO } from '../dao/address.dao';
+import { CustomerCreateDTO, CustomersListDTO, CustomerUpdateDTO } from '../dto/customer.dto'
 import { Customer } from '../model/customer';
 
 export class CustomerService {
@@ -26,7 +29,7 @@ export class CustomerService {
     public async searchById(id: string) {
         const customerInfo = await this.customerDAO.searchById(id);
         if (customerInfo) {
-            const customer = [customerInfo.customer, customerInfo.email[0], customerInfo.phone[0], customerInfo.address[0]]
+            const customer = [customerInfo.customer[0], customerInfo.email[0], customerInfo.phone[0], customerInfo.address[0]]
             return customer;
         }
         return null;
@@ -34,18 +37,91 @@ export class CustomerService {
 
     public async update(id: string, customerUpdateDTO: CustomerUpdateDTO) {
         try {
-            const existingUser = await this.customerDAO.updateSearchById(id);
-            if (!existingUser) {
-                throw new Error('User not found');
+            const existingCustomer = await this.customerDAO.updateSearchById(id);
+            if (!existingCustomer) {
+                throw new Error('Customer not found');
             }
             if (customerUpdateDTO.name == null) {
-                customerUpdateDTO.name = existingUser[0].name
+                customerUpdateDTO.name = existingCustomer[0].name
             }
             if (customerUpdateDTO.status == null) {
-                customerUpdateDTO.status = existingUser[0].status
+                customerUpdateDTO.status = existingCustomer[0].status
             }
 
             await this.customerDAO.update(id, customerUpdateDTO);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public async delete(id: string) {
+        try {
+            const customerExists = await this.customerDAO.searchById(id);
+            if (!customerExists) {
+                throw new Error('Customer not found');
+            }
+
+            if (await this.customerHasEmail(id)) {
+                try {
+                    const emailDao = new EmailDAO();
+                    await emailDao.deleteByCustomerId(id);
+                } catch (error) {
+                    throw error;
+                }
+            }
+            if (await this.customerHasPhone(id)) {
+                try {
+                    const phoneDao = new PhoneDAO();
+                    await phoneDao.deleteByCustomerId(id);
+                } catch (error) {
+                    throw error;
+                }
+            }
+            if (await this.customerHasAddress(id)) {
+                try {
+                    const addressDao = new AddressDAO();
+                    await addressDao.deleteByCustomerId(id);
+                } catch (error) {
+                    throw error;
+                }
+            }
+            await this.customerDAO.delete(id);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public async customerHasEmail(id: string): Promise<boolean> {
+        try {
+            const customerInfo = await this.customerDAO.searchById(id);
+            if (customerInfo && customerInfo.email && customerInfo.email.length > 0) {
+                return true;
+            }
+            return false;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public async customerHasPhone(id: string): Promise<boolean> {
+        try {
+            const customerInfo = await this.customerDAO.searchById(id);
+            if (customerInfo && customerInfo.phone && customerInfo.phone.length > 0) {
+                return true;
+            }
+            return false;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public async customerHasAddress(id: string): Promise<boolean> {
+        try {
+            const customerInfo = await this.customerDAO.searchById(id);
+            if (customerInfo && customerInfo.address && customerInfo.address.length > 0) {
+                return true;
+            }
+            return false;
         } catch (error) {
             throw error;
         }

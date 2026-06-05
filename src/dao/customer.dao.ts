@@ -1,7 +1,12 @@
 import { RowDataPacket } from "mysql2";
 import { Customer } from "../model/customer";
 import { connection } from "../util/connection";
-import { CustomersListDTO, CustomerUpdateDTO } from '../dto/customer.dto'
+import { CustomersListDTO, CustomerUpdateDTO } from '../dto/customer.dto';
+
+//
+import { EmailService } from "../service/email.service";
+import { PhoneService } from "../service/phone.service";
+import { AddressService } from "../service/address.service";
 
 export class CustomerDAO {
     async create(customer: Customer): Promise<void> {
@@ -116,12 +121,9 @@ export class CustomerDAO {
         }
     }
 
-    async delete(id: number): Promise<void> {//unfinished
+    async delete(id: string): Promise<void> {
         try{
             const [result] : any = await connection.query('DELETE FROM customers WHERE id = ?', [id]);
-            if (result.affectedRows === 0) {
-                throw new Error('Customer not found');
-            }
         } catch (error) {
             console.error('Error deleting customer:', error);
             throw new Error('Failed to delete customer');

@@ -38,6 +38,17 @@ export class PhoneControle{
         }
     }
 
+    public async searchByCustomerId(req: Request, res: Response) {
+        try {
+            const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+            const phoneDTO = await this.phoneService.searchByCustomerId(id);
+            res.status(200).json(phoneDTO);
+        } catch (error: any) {
+            console.error('Error searching phone:', error);
+            res.status(500).json({ error: error.message || 'Error searching phone' });
+        }
+    }
+
     public async update (req: Request, res: Response) {
         try{
             const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;

@@ -62,4 +62,18 @@ export class CustomerControle {
             res.status(500).json({ error: error.message || 'Error updating user' });
         }
     }
+
+    public async delete(req: Request, res: Response) {
+        try {
+            const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+            await this.customerService.delete(id);
+            res.status(200).json({ message: 'User deleted successfully' });
+        } catch (error: any) {
+            console.error('Error deleting user:', error);
+            if (error.message === 'User not found') {
+                return res.status(404).json({ error: 'User not found' });
+            }
+            res.status(500).json({ error: error.message || 'Error deleting user' });
+        }
+    }
 }

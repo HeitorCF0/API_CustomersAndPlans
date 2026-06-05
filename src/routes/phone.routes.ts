@@ -15,7 +15,7 @@ phoneRoutes
 
 phoneRoutes
     .route('/:id')
-    .get(async (req, res) => phoneControle.searchById(req, res))
+    .get(async (req, res) => phoneControle.searchByCustomerId(req, res))
     .put(async (req, res) => phoneControle.update(req, res))
     .delete(async (req, res) => phoneControle.delete(req, res))
 

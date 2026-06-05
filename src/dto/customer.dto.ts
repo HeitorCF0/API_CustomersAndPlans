@@ -9,13 +9,6 @@ export class CustomersListDTO {
     status: string;
 }
 
-export class CustomerSearchByIdDTO {
-    id: string;
-    name: string;
-    createdAt: Date;
-    status: string;
-}
-
 export class CustomerCreateDTO {
     @IsNotEmpty()
     @IsString()

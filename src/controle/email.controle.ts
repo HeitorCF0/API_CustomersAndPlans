@@ -38,6 +38,17 @@ export class EmailControle {
         }
     }
 
+    public async searchByCustomerId(req: Request, res: Response) {
+        try {
+            const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+            const emailDTO = await this.emailService.searchByCustomerId(id);
+            res.status(200).json(emailDTO);
+        } catch (error: any) {
+            console.error('Error searching email by customer ID:', error);
+            res.status(500).json({ error: error.message || 'Error searching email by customer ID' });
+        }
+    }
+
     public async update (req: Request, res: Response) {
         try{
             const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;

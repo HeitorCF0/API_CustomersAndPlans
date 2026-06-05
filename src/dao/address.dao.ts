@@ -50,13 +50,13 @@ export class AddressDAO {
         }
     }
 
-    async searchByClientId(clientId: string): Promise<Address | null> {
+    async searchByCustomerId(customerId: string) {
         try {
-            const [rows] : any = await connection.query('SELECT * FROM adresses WHERE clientId = ?', [clientId]);
-            return rows.length > 0 ? this.mapAdress(rows[0]) : null;
+            const [rows] : any = await connection.query('SELECT id, street, number, neighborhood, city, state, cep, complement FROM adresses WHERE customerId = ?', [customerId]);
+            return rows;
         } catch (error) {
-            console.error('Error searching adresses by client ID:', error);
-            throw new Error('Failed to search adresses by client ID');
+            console.error('Error searching adresses by customer ID:', error);
+            throw new Error('Failed to search adresses by customer ID');
         }
     }
 
@@ -84,15 +84,15 @@ export class AddressDAO {
         }
     }
 
-    async deleteByClientId(clientId: string): Promise<void> {
+    async deleteByCustomerId(customerId: string): Promise<void> {
         try{
-            const [result] : any = await connection.query('DELETE FROM adresses WHERE clientId = ?', [clientId]);
+            const [result] : any = await connection.query('DELETE FROM adresses WHERE customerId = ?', [customerId]);
             if (result.affectedRows === 0) {
-                throw new Error('Adresses not found for the given client ID');
+                throw new Error('Adresses not found for the given customer ID');
             }
         } catch (error) {
-            console.error('Error deleting adresses by client ID:', error);
-            throw new Error('Failed to delete adresses by client ID');
+            console.error('Error deleting adresses by customer ID:', error);
+            throw new Error('Failed to delete adresses by customer ID');
         }
     }
 

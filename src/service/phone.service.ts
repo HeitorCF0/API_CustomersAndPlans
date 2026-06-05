@@ -33,6 +33,19 @@ export class PhoneService {
         }
     }
 
+    public async searchByCustomerId(customerId: string) {
+        try{
+            const phoneDTO = await this.phoneDAO.searchByCustomerId(customerId);
+
+            if (phoneDTO) {
+                return phoneDTO;
+            }
+            throw new Error("Phone not found");
+        }catch (error){
+            throw error
+        }
+    }
+
     public async update(id: string, newPhone: PhoneUpdateDTO) {
         try{
             await this.phoneDAO.update(id, newPhone);

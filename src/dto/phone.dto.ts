@@ -11,6 +11,7 @@ export class PhoneCreateDTO {
 }
 
 export class PhoneListDTO{
+    id: string;
     phone: string;
     customerId: string;
     customerName: string;

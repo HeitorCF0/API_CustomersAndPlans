@@ -35,34 +35,39 @@ export class PhoneDAO {
         }
     }
 
-    async searchById(id: string): Promise<Phone | null> {
+    // async searchById(id: string): Promise<Phone | null> {
+    //     try {
+    //         const [rows] : any = await connection.query(`
+    //             SELECT 
+    //             p.id, 
+    //             p.phone, 
+    //             p.customerId, 
+    //             c.name as customerName,
+    //             c.status as customerStatus,
+    //             c.createdAt as customerCreatedAt
+    //             FROM phones p 
+    //             JOIN customers c 
+    //             ON p.customerId = c.id 
+    //             WHERE p.id = ?`, [id]);
+    //         return rows.length > 0 ? this.mapPhone(rows[0]) : null;
+    //     } catch (error) {
+    //         console.error('Error searching phone by ID:', error);
+    //         throw new Error('Failed to search phone by ID');
+    //     }
+    // }
+
+    async searchByCustomerId(customerId: string): Promise<PhoneListDTO[] | null> {
         try {
-            const [rows] : any = await connection.query(`
+            const [rows] = await connection.query<PhoneListDTO[] & RowDataPacket[]>(`
                 SELECT 
                 p.id, 
-                p.phone, 
-                p.customerId, 
-                c.name as customerName,
-                c.status as customerStatus,
-                c.createdAt as customerCreatedAt
+                p.phone
                 FROM phones p 
-                JOIN customers c 
-                ON p.customerId = c.id 
-                WHERE p.id = ?`, [id]);
-            return rows.length > 0 ? this.mapPhone(rows[0]) : null;
+                WHERE p.customerId = ?`, [customerId]);
+            return rows;
         } catch (error) {
-            console.error('Error searching phone by ID:', error);
-            throw new Error('Failed to search phone by ID');
-        }
-    }
-
-    async searchByClientId(clientId: string): Promise<Phone[]> {
-        try {
-            const [rows] = await connection.query('SELECT id, phone FROM phones WHERE customerId = ?', [clientId]);
-            return rows.map((row: any) => {return Phone.reconstruct({id: row.id, customerId: clientId, phone: row.phone})});
-        } catch (error) {
-            console.error('Error searching phone by client ID:', error);
-            throw new Error('Failed to search phone by client ID');
+            console.error('Error searching phone by customer ID:', error);
+            throw new Error('Failed to search phone by customer ID');
         }
     }
 
@@ -90,15 +95,15 @@ export class PhoneDAO {
         }
     }
 
-    async deleteByClientId(clientId: string): Promise<void> {
+    async deleteByCustomerId(customerId: string): Promise<void> {
         try{
-            const [result] : any = await connection.query('DELETE FROM phones WHERE customerId = ?', [clientId]);
+            const [result] : any = await connection.query('DELETE FROM phones WHERE customerId = ?', [customerId]);
             if (result.affectedRows === 0) {
-                throw new Error('Phones not found for the client');
+                throw new Error('Phones not found for the customer ID');
             }
         } catch (error) {
-            console.error('Error deleting phones by client ID:', error);
-            throw new Error('Failed to delete phones by client ID');
+            console.error('Error deleting phones by customer ID:', error);
+            throw new Error('Failed to delete phones by customer ID');
         }
     }
 }

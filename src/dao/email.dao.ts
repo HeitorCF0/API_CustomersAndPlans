@@ -56,24 +56,18 @@ export class EmailDAO {
         }
     }
 
-    async searchByClientId(clientId: string): Promise<Email | null> {
+    async searchByCustomerId(customerId: string): Promise<Email | null> {
         try {
             const [rows] : any = await connection.query(`
                 SELECT 
                 e.id, 
-                e.email, 
-                e.customerId, 
-                c.name as customerName,
-                c.status as customerStatus,
-                c.createdAt as customerCreatedAt
-                FROM email e 
-                JOIN customers c 
-                ON e.customerId = c.id 
-                WHERE .id = ?`, [clientId]);
-            return rows.length > 0 ? this.mapEmail(rows[0]) : null;
+                e.email
+                FROM emails e
+                WHERE e.customerId = ?`, [customerId]);
+            return rows;
         }catch (error) {
-            console.error('Error searching email by client ID:', error);
-            throw new Error('Failed to search email by client ID');
+            console.error('Error searching email by customer ID:', error);
+            throw new Error('Failed to search email by customer ID');
         }
     }
 
@@ -101,15 +95,15 @@ export class EmailDAO {
         }
     }
 
-    async deleteByClientId(clientId: string): Promise<void> {
+    async deleteByCustomerId(customerId: string): Promise<void> {
         try{
-            const [result] : any = await connection.query('DELETE FROM emails WHERE customerId = ?', [clientId]);
+            const [result] : any = await connection.query('DELETE FROM emails WHERE customerId = ?', [customerId]);
             if (result.affectedRows === 0) {
                 throw new Error('Email not found');
             }
         } catch (error) {
-            console.error('Error deleting email by client ID:', error);
-            throw new Error('Failed to delete email by client ID');
+            console.error('Error deleting email by customer ID:', error);
+            throw new Error('Failed to delete email by customer ID');
         }
     }
 

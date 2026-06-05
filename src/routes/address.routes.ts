@@ -15,7 +15,7 @@ addressRoutes
 
 addressRoutes
     .route('/:id')
-    .get(async (req, res) => addressControle.searchById(req, res))
+    .get(async (req, res) => addressControle.searchByCustomerId(req, res))
     .put(async (req, res) => addressControle.update(req, res))
     .delete(async (req, res) => addressControle.delete(req, res))
 

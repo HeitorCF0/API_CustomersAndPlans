@@ -33,6 +33,19 @@ export class AddressService {
         }
     }
 
+    public async searchByCustomerId(customerId: string) {
+        try{
+            const addressDTO = await this.addressDAO.searchByCustomerId(customerId);
+
+            if (addressDTO) {
+                return addressDTO;
+            }
+            throw new Error("Address not found");
+        }catch (error){
+            throw error
+        }
+    }
+
     public async update(id: string, newAddress: AddressUpdateDTO) {
         try{
             const existingAddress = await this.addressDAO.updateSearchById(id);

@@ -46,6 +46,15 @@ export class EmailService {
         }
     }
 
+    public async searchByCustomerId(customerId: string) {
+        try{
+            const emailDTO = await this.emailDAO.searchByCustomerId(customerId);
+            return emailDTO;
+        }catch (error){
+            throw error
+        }
+    }
+
     public async customerExists(customerId: string): Promise<boolean> {
         const customerDAO = new CustomerDAO();
         const result = await customerDAO.searchById(customerId);
