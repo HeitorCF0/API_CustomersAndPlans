@@ -1,3 +1,5 @@
+import { PlanCreateDTO } from "../dto/plan.dto";
+
 export enum planType {
     Weekly = 'WEEKLY',
     Monthly = 'MONTHLY',
@@ -10,7 +12,7 @@ export enum planType {
 export type propsPlan = {
     id: string;
     name: string;
-    description: string | null;
+    description: string | undefined;
     price: number;
     type: planType;
     createdAt: Date;
@@ -19,7 +21,7 @@ export type propsPlan = {
 export class Plan {
     constructor(private props: propsPlan) {}
 
-    public static construct(name: string, description: string | null, price: number, type: planType) {
+    public static construct({name, description, price, type}: PlanCreateDTO) {
         if (!name) {throw new Error("Name fields is required");}
         if (!price) {throw new Error("Price fields is required");}
         if (!type) {throw new Error("Type fields is required");}

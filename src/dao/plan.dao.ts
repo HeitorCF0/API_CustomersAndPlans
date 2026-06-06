@@ -1,3 +1,5 @@
+import { RowDataPacket } from "mysql2";
+import { PlanSearchAllDTO, PlanUpdateDTO } from "../dto/plan.dto";
 import { Plan } from "../model/plan";
 import { connection } from "../util/connection";
 
@@ -14,29 +16,30 @@ export class PlanDAO {
         }
     }
 
-    async searchAll(): Promise<Plan[]> {
+    async searchAll(): Promise<PlanSearchAllDTO[]> {
         try {
-            const [plans] = await connection.query(
-                `SELECT plan.id, 
-                plan.name, 
-                plan.price, 
-                plan.type 
+            const [plans] = await connection.query<PlanSearchAllDTO[] & RowDataPacket[]>(
+                `SELECT 
+                plans.id, 
+                plans.name, 
+                plans.price, 
+                plans.type 
                 FROM plans`
             );
-            return plans.map((plan: any) => {return {id: plan.id, name: plan.name, price: plan.price, type: plan.type}});
+            return plans ;
         } catch (error) {
             console.error('Error searching plans:', error);
             throw new Error('Failed to search plans');
         }
     }
 
-    async searchById(id: number): Promise<Plan | null> {
+    async searchById(id: string): Promise<Plan | null> {
         try {
-            const [rows] = await connection.query('SELECT * FROM plans WHERE id = ?', [id]);
+            const [rows] = await connection.query<RowDataPacket[]>('SELECT * FROM plans WHERE id = ?', [id]);
             if (rows.length === 0) {
                 return null;
             }
-            return Plan.reconstruct(rows[0]);
+            return Plan.reconstruct(rows[0] as any);
         } catch (error) {
             console.error('Error searching plan by ID:', error);
             throw new Error('Failed to search plan by ID');
@@ -45,7 +48,7 @@ export class PlanDAO {
 
     async searchByType(type: string): Promise<Plan[]> {
         try {
-            const [rows] = await connection.query('SELECT * FROM plans WHERE type = ?', [type]);
+            const [rows] = await connection.query<RowDataPacket[]>('SELECT * FROM plans WHERE type = ?', [type]);
             return rows.map((row: any) => Plan.reconstruct(row));
         } catch (error) {
             console.error('Error searching plan by type:', error);
@@ -53,11 +56,25 @@ export class PlanDAO {
         }
     }
 
-    async update(plan: Plan): Promise<void> {
+    async updateSearchById(id: string): Promise<PlanUpdateDTO[] | null> {
+        try {
+            const [planDTO] = await connection.query<PlanUpdateDTO[] & RowDataPacket[]>('SELECT name, description, price, type FROM plans WHERE id = ?', [id])
+            if (planDTO.length === 0) {
+                return null;
+            }
+            return planDTO;
+        } catch (error) {
+            console.error('Error searching plan by ID for update:', error);
+            throw new Error('Failed to search plan by ID for update');
+        }
+    }
+
+
+    async update(id: string, newPlan: PlanUpdateDTO): Promise<void> {
         try{
             const [result] = await connection.query(
                 'UPDATE plans SET name = ?, description = ?, price = ?, type = ? WHERE id = ?',
-                [plan.name, plan.description, plan.price, plan.type, plan.id]
+                [newPlan.name, newPlan.description, newPlan.price, newPlan.type, id]
             );
         } catch (error) {
             console.error('Error updating plan:', error);
@@ -65,10 +82,11 @@ export class PlanDAO {
         }
     }
 
-    async delete(id: number): Promise<void> {
+
+    async delete(id: string): Promise<void> {
         try{
-            const [result] = await connection.query('DELETE FROM plans WHERE id = ?', [id]);
-            if (result.affectedRows === 0) {
+            const [result] = await connection.query('DELETE FROM plans WHERE id = ?', [id]) as any[];
+            if ((result as any).affectedRows === 0) {
                 throw new Error('Plan not found');
             }
         } catch (error) {

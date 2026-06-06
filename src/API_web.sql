@@ -6,7 +6,7 @@ create table `plans` (
 `id` varchar(100) not null,
 `name` varchar(100) not null,
 `description` varchar(100) not null,
-`price` decimal(10, 0) not null,
+`price` decimal(10, 2) not null,
 `type` varchar(100) not null,
 `createdAt` date not null,
 primary key (`id`)
@@ -84,7 +84,7 @@ constraint `emails_customers_FK` foreign key (`customerId`) references `customer
 create table `installment` (
 `id` varchar(100) not null,
 `dueDate` date not null,
-`amount` decimal(10, 0) not null,
+`amount` decimal(10, 2) not null,
 `state` varchar(100) not null,
 `createdAt` varchar(100) not null,
 `subscriptionId` varchar(100) not null,
@@ -98,7 +98,7 @@ constraint `installment_subscriptions_FK` foreign key (`subscriptionId`) referen
 create table `payments` (
 `id` varchar(100) not null,
 `installmentId` varchar(100) not null,
-`amount` decimal(10, 0) not null,
+`amount` decimal(10, 2) not null,
 `paymentMethod` varchar(100) not null,
 `status` varchar(100) not null,
 `comment` varchar(100) default null,
