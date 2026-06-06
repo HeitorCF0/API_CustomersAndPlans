@@ -126,4 +126,17 @@ export class CustomerService {
             throw error;
         }
     }
+
+    //  
+    // public async customerHasSubscription(id: string): Promise<boolean> {
+    //     try {
+    //         const customerInfo = await this.customerDAO.searchById(id);
+    //         if (customerInfo && customerInfo.subscription && customerInfo.subscription.length > 0) {
+    //             return true;
+    //         }
+    //         return false;
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
 }

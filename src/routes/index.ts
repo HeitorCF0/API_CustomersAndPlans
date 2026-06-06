@@ -5,11 +5,13 @@ import emailRoutes from './email.routes';
 import phoneRoutes from './phone.routes';
 import addressRoutes from './address.routes';
 import planRoutes from './plan.routes';
+import subscriptionRoutes from './subscription.routes';
 
 const routes = Router();
 
 routes.use('/user', userRoutes);
 routes.use('/customer', customerRoutes)
+routes.use('/subscription', subscriptionRoutes)
 routes.use('/plan', planRoutes)
 routes.use('/email', emailRoutes)
 routes.use('/phone', phoneRoutes)

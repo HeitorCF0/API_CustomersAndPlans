@@ -1,3 +1,4 @@
+import { SubscriptionCreateDTO } from "../dto/subscription.dto";
 import { Customer } from "./customer";
 import { Plan } from "./plan";
 
@@ -20,15 +21,15 @@ export type propsSubscription = {
 export class Subscription {
     constructor(private props: propsSubscription) {}
 
-    public static construct(customerId: string, planId: string, startDate: Date, state: subscriptionState) {
-        if (!customerId || !planId || !startDate || !state) {
+    public static construct(subscriptionCreateDTO: SubscriptionCreateDTO) {
+        if (!subscriptionCreateDTO.customerId || !subscriptionCreateDTO.planId) {
             throw new Error("All fields are required");
         }
         const props: propsSubscription = {
             id: crypto.randomUUID().toString(),
-            customerId,
-            planId,
-            startDate,
+            customerId: subscriptionCreateDTO.customerId,
+            planId: subscriptionCreateDTO.planId,
+            startDate: new Date(),
             state: subscriptionState.ACTIVE,
         }
         return new Subscription(props);

@@ -1,10 +1,7 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { subscriptionState } from "../model/subscription";
 
-export class SubscriptionListDTO {
-    @IsNotEmpty()
-    @IsString()
-    id: string;
-
+export class SubscriptionCreateDTO {
     @IsNotEmpty()
     @IsString()
     customerId: string;
@@ -12,16 +9,34 @@ export class SubscriptionListDTO {
     @IsNotEmpty()
     @IsString()
     planId: string;
+}
 
-    @IsNotEmpty()
-    @IsString()
-    state: string;
+export class SubscriptionListDTO {
+    id: string;
+    customerId: string;
+    customerName: string;
+    planId: string;
+    planName: string;
+    price: number;
+    state: subscriptionState;
+}
 
-    @IsNotEmpty()
-    @IsString()
-    customer_Name: string;
+export class subscriptionSearchByIdDTO {
+    id: string;
+    customerId: string;
+    customerName: string;
+    customerStatus: string;
+    planId: string;
+    planName: string;
+    planDescription: string;
+    planPrice: number;
+    planType: string;
+    startDate: Date;
+    state: subscriptionState;
+}
 
+export class subscriptionStateUpdateDTO {
     @IsNotEmpty()
-    @IsString()
-    plan_Name: string;
+    @IsEnum(subscriptionState)
+    state: subscriptionState;
 }
