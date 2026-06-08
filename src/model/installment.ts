@@ -1,3 +1,4 @@
+import { InstallmentCreateDTO } from "../dto/installment.dto";
 import { Subscription } from "./subscription";
 
 //parcela
@@ -21,16 +22,16 @@ export type propsInstallment = {
 export class Installment {
     constructor(private props: propsInstallment) {}
 
-    public static construct(subscriptionId: string, amount: number, dueDate: Date) {
-        if (!subscriptionId) {throw new Error("SubscriptionId field is required")}
-        if (!amount) {throw new Error("Amount field is required")}
-        if (!dueDate) {throw new Error("DueDate field is required")}
+    public static construct(installmentCreateDTO: InstallmentCreateDTO) {
+        if (!installmentCreateDTO.subscriptionId) {throw new Error("SubscriptionId field is required")}
+        if (!installmentCreateDTO.amount) {throw new Error("Amount field is required")}
+        if (!installmentCreateDTO.dueDate) {throw new Error("DueDate field is required")}
 
         const props: propsInstallment = {
             id: crypto.randomUUID().toString(),
-            subscriptionId,
-            amount,
-            dueDate,
+            subscriptionId: installmentCreateDTO.subscriptionId,
+            amount: installmentCreateDTO.amount,
+            dueDate: installmentCreateDTO.dueDate,
             state: installmentState.Pending,
             paidAt: null,
             createdAt: new Date()

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, IsEnum } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsEnum, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Customer } from '../model/customer';
 import { installmentState } from '../model/installment';
@@ -11,7 +11,7 @@ export class InstallmentListDTO {
     planName: string;
 }
 
-export class InstallmentListByIdDTO{
+export class InstallmentSearchtByIdDTO{
     id: string;
     state: installmentState;
     amount: number;
@@ -19,21 +19,16 @@ export class InstallmentListByIdDTO{
     subscriptionId: string
     createdAt: Date;
     paidAt: Date | null;
+    customerId: string;
     customerName: string;
+    planId: string;
     planName: string;
 }
 
-export class CreateInstallmentDTO {
-    @IsNotEmpty()
-    @IsString()
-    id: string;
-
+export class InstallmentCreateDTO {
     @IsNotEmpty()
     @IsString()
     subscriptionId: string;
-
-    @Type(() => Customer)
-    subscription?: Customer;
 
     @IsNotEmpty()
     @IsNumber()
@@ -42,15 +37,22 @@ export class CreateInstallmentDTO {
     @IsNotEmpty()
     @Type(() => Date)
     dueDate: Date;
+}
 
-    @IsNotEmpty()
+export class InstallmentUpdateDTO {
+    @IsOptional()
+    @IsNumber()
+    amount?: number;
+
+    @IsOptional()
+    @Type(() => Date)
+    dueDate?: Date;
+
+    @IsOptional()
     @IsEnum(installmentState)
-    state: installmentState;
+    state?: installmentState;
 
+    @IsOptional()
     @Type(() => Date)
     paidAt?: Date | null;
-
-    @IsNotEmpty()
-    @Type(() => Date)
-    createdAt: Date;
 }

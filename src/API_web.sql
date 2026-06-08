@@ -88,6 +88,7 @@ create table `installment` (
 `state` varchar(100) not null,
 `createdAt` varchar(100) not null,
 `subscriptionId` varchar(100) not null,
+`paidAt` date default null,
 primary key (`id`),
 key `installment_subscriptions_FK` (`subscriptionId`),
 constraint `installment_subscriptions_FK` foreign key (`subscriptionId`) references `subscriptions` (`id`)

@@ -1,6 +1,7 @@
 import { CustomerDAO } from '../dao/customer.dao'
 import { EmailDAO } from '../dao/email.dao';
 import { PhoneDAO } from '../dao/phone.dao';
+import { SubscriptionDAO } from '../dao/subscription.dao';
 import { AddressDAO } from '../dao/address.dao';
 import { CustomerCreateDTO, CustomersListDTO, CustomerUpdateDTO } from '../dto/customer.dto'
 import { Customer } from '../model/customer';
@@ -59,6 +60,10 @@ export class CustomerService {
             const customerExists = await this.customerDAO.searchById(id);
             if (!customerExists) {
                 throw new Error('Customer not found');
+            }
+
+            if (await this.customerHasSubscription(id)) {
+                throw new Error('Customer has associated subscription')
             }
 
             if (await this.customerHasEmail(id)) {
@@ -127,16 +132,16 @@ export class CustomerService {
         }
     }
 
-    //  
-    // public async customerHasSubscription(id: string): Promise<boolean> {
-    //     try {
-    //         const customerInfo = await this.customerDAO.searchById(id);
-    //         if (customerInfo && customerInfo.subscription && customerInfo.subscription.length > 0) {
-    //             return true;
-    //         }
-    //         return false;
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
+    public async customerHasSubscription(id: string): Promise<boolean> {
+        try {
+            const subscriptionDAO = new SubscriptionDAO();
+            const subscriptions = await subscriptionDAO.searchByCustomerId(id);
+            if (subscriptions && subscriptions.length > 0) {
+                return true;
+            }
+            return false;
+        } catch (error) {
+            throw error;
+        }
+    }
 }

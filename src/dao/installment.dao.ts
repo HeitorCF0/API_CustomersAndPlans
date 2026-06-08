@@ -1,4 +1,4 @@
-import { InstallmentListByIdDTO, InstallmentListDTO } from "../dto/installment.dto";
+import { InstallmentSearchtByIdDTO, InstallmentListDTO, InstallmentUpdateDTO } from "../dto/installment.dto";
 import { Installment } from "../model/installment";
 import { connection } from "../util/connection";
 import { RowDataPacket } from "mysql2";
@@ -7,7 +7,7 @@ export class InstallmentDAO {
     async create(installment: Installment): Promise<void> {
         try {
             const [result] = await connection.query(
-                'INSERT INTO installments (id, subscriptionId, dueDate, amount, state, createdAt) VALUES (?, ?, ?, ?, ?, ?)', 
+                'INSERT INTO installment (id, subscriptionId, dueDate, amount, state, createdAt) VALUES (?, ?, ?, ?, ?, ?)', 
                 [installment.id, installment.subscriptionId, installment.dueDate, installment.amount, installment.state, installment.createdAt]
             );
         } catch (error) {
@@ -25,7 +25,7 @@ export class InstallmentDAO {
                 i.amount, 
                 c.name,
                 p.name
-                FROM installments i 
+                FROM installment i 
                 JOIN subscriptions s 
                 ON i.subscriptionId = s.id
                 JOIN customers c 
@@ -38,24 +38,26 @@ export class InstallmentDAO {
         }
     }
 
-    async searchById(id: number): Promise<InstallmentListByIdDTO | null> {
+    async searchById(id: string): Promise<InstallmentSearchtByIdDTO | null> {
         try {
-            const [installmentListByIdDTO] = await connection.query<InstallmentListByIdDTO[] & RowDataPacket[]>(`
+            const [installmentListByIdDTO] = await connection.query<InstallmentSearchtByIdDTO[] & RowDataPacket[]>(`
                 SELECT
-                i.id,
+                i.id as installment_Id,
                 i.state,
                 i.amount,
                 i.dueDate,
                 i.subscriptionId,
                 i.createdAt,
                 i.paidAt,
-                c.name,
-                p.name
-                FROM installments i
+                s.customerId as customer_Id,
+                c.name as customer_Name,
+                s.planId as plan_Id,
+                p.name as  plan_Name
+                FROM installment i
                 JOIN subscriptions s
-                ON i.subscriptionsId = s.id
+                ON i.subscriptionId = s.id
                 JOIN customers c
-                ON s.customersId = c.id
+                ON s.customerId = c.id
                 JOIN plans p ON s.planId = p.id WHERE i.id = ?`, [id]);
             if (installmentListByIdDTO.length === 0) {
                 return null;
@@ -76,7 +78,7 @@ export class InstallmentDAO {
                 i.amount, 
                 c.name,
                 p.name
-                FROM installments i 
+                FROM installment i 
                 JOIN subscriptions s 
                 ON i.subscriptionId = s.id
                 JOIN customers c 
@@ -99,7 +101,7 @@ export class InstallmentDAO {
                 i.amount, 
                 c.name,
                 p.name
-                FROM installments i 
+                FROM installment i 
                 JOIN subscriptions s 
                 ON i.subscriptionId = s.id
                 JOIN customers c 
@@ -124,7 +126,7 @@ export class InstallmentDAO {
                 i.amount, 
                 c.name,
                 p.name
-                FROM installments i 
+                FROM installment i 
                 JOIN subscriptions s 
                 ON i.subscriptionId = s.id
                 JOIN customers c 
@@ -142,11 +144,11 @@ export class InstallmentDAO {
 
 
 
-    async update(installment: Installment): Promise<void> {
+    async update(id: string, installmentUpdateDTO: InstallmentUpdateDTO): Promise<void> {
         try{
             const [result] = await connection.query(
-                'UPDATE installments SET subscriptionId = ?, dueDate = ?, amount = ?, state = ?, paidAt = ?, createdAt = ? WHERE id = ?',
-                [installment.subscriptionId, installment.dueDate, installment.amount, installment.state, installment.paidAt, installment.createdAt, installment.id]
+                'UPDATE installment SET dueDate = ?, amount = ?, state = ?, paidAt = ? WHERE id = ?',
+                [installmentUpdateDTO.dueDate, installmentUpdateDTO.amount, installmentUpdateDTO.state, installmentUpdateDTO.paidAt, id]
             );
         } catch (error) {
             console.error('Error updating installment:', error);
@@ -154,9 +156,9 @@ export class InstallmentDAO {
         }
     }
 
-    async delete(id: number): Promise<void> {
+    async delete(id: string): Promise<void> {
         try{
-            const [result] = await connection.query('DELETE FROM installments WHERE id = ?', [id]);
+            const [result] : any = await connection.query('DELETE FROM installment WHERE id = ?', [id]);
             if (result.affectedRows === 0) {
                 throw new Error('Installment not found');
             }
@@ -181,7 +183,7 @@ export class InstallmentDAO {
     async deleteByPlanId(planId: string): Promise<void> {
         try{
             const [result] = await connection.query(
-                'DELETE FROM installments WHERE subscriptionId IN (SELECT id FROM subscriptions WHERE planId = ?)',
+                'DELETE FROM installment WHERE subscriptionId IN (SELECT id FROM subscriptions WHERE planId = ?)',
                 [planId]
             );
         } catch (error) {

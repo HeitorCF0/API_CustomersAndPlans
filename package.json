@@ -1,5 +1,5 @@
 {
-  "name": "litera",
+  "name": "api-web",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -21,6 +21,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "express": "^5.2.1",
-    "mysql2": "^3.22.3"
+    "mysql2": "^3.22.3",
+    "reflect-metadata": "^0.2.2"
   }
 }
