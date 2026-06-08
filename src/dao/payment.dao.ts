@@ -7,7 +7,7 @@ export class PaymentDAO {
     async create(payment: Payment): Promise<void> {
         try {
             const [result] = await connection.query(
-                'INSERT INTO payments (id, installmentId, amount, paymentMethod, status, comment, paidDate) VALUES (?, ?, ?, ?, ?, ?)', 
+                'INSERT INTO payments (id, installmentId, amount, paymentMethod, status, comment, paidDate) VALUES (?, ?, ?, ?, ?, ?, ?)', 
                 [payment.id, payment.installmentId, payment.amount, payment.paymentMethod, payment.status, payment.comment, payment.paidDate]
             );
         } catch (error) {
@@ -23,13 +23,13 @@ export class PaymentDAO {
             pay.id, 
             pay.installmentId, 
             pay.amount,
-            i.amount as installmentAmount,
+            i.amount as installment_Amount,
             pay.status,
             i.dueDate,
-            p.planName,
-            c.customerName
+            p.name as plan_Name,
+            c.name as customer_Name
             FROM payments pay
-            JOIN installmets i 
+            JOIN installment i 
             ON pay.installmentId = i.id
             JOIN subscriptions s
             ON i.subscriptionId = s.id
@@ -57,19 +57,19 @@ export class PaymentDAO {
             pay.paidDate,
             pay.paymentMethod,
             i.dueDate,
-            p.planName,
-            c.customerName
+            p.name as plan_Name,
+            c.name as customer_Name
             FROM payments pay
-            JOIN installmets i 
+            JOIN installment i 
             ON pay.installmentId = i.id
-            jOIN subscriptions s
+            JOIN subscriptions s
             ON i.subscriptionId = s.id
             JOIN customers c
             ON s.customerId = c.id
             JOIN plans p
             ON s.planId = p.id
-            WHERE id = ?`, [id]);
-            return PaymentListByIdDTO;
+            WHERE pay.id = ?`, [id]);
+            return PaymentListByIdDTO[0];
         } catch (error) {
             console.error('Error searching payment by ID:', error);
             throw new Error('Failed to search payment by ID');
@@ -86,10 +86,10 @@ export class PaymentDAO {
             i.amount as installmentAmount,
             pay.status,
             i.dueDate,
-            p.planName,
-            c.customerName
+            p.name as plan_Name,
+            c.name as customer_Name
             FROM payments pay
-            JOIN installmets i 
+            JOIN installment i 
             ON pay.installmentId = i.id
             JOIN subscriptions s
             ON i.subscriptionId = s.id
@@ -116,10 +116,10 @@ export class PaymentDAO {
             i.amount as installmentAmount,
             pay.status,
             i.dueDate,
-            p.planName,
-            c.customerName
+            p.name as plan_Name,
+            c.name as customer_Name
             FROM payments pay
-            JOIN installmets i 
+            JOIN installment i 
             ON pay.installmentId = i.id
             JOIN subscriptions s
             ON i.subscriptionId = s.id
@@ -146,10 +146,10 @@ export class PaymentDAO {
             i.amount as installmentAmount,
             pay.status,
             i.dueDate,
-            p.planName,
-            c.customerName
+            p.name as plan_Name,
+            c.name as customer_Name
             FROM payments pay
-            JOIN installmets i 
+            JOIN installment i 
             ON pay.installmentId = i.id
             JOIN subscriptions s
             ON i.subscriptionId = s.id
@@ -180,7 +180,7 @@ export class PaymentDAO {
 
     async delete(id: string): Promise<void> {
         try {
-            const [result] = await connection.query('DELETE FROM payments WHERE id = ?', [id]);
+            const [result] : any = await connection.query('DELETE FROM payments WHERE id = ?', [id]);
             if (result.affectedRows === 0) {
                 throw new Error('Payment not found');
             }
@@ -192,7 +192,7 @@ export class PaymentDAO {
 
     async deleteByInstallmentId(installmentId: string): Promise<void> {
         try {
-            const [result] = await connection.query('DELETE FROM payments WHERE installmentId = ?', [installmentId]);
+            const [result] : any = await connection.query('DELETE FROM payments WHERE installmentId = ?', [installmentId]);
             if (result.affectedRows === 0) {
                 throw new Error('Payment not found');
             }
@@ -205,7 +205,7 @@ export class PaymentDAO {
     async deleteByCustomerId(customerId: string): Promise<void> {
         try {
             const [result] = await connection.query(
-                'DELETE FROM payments WHERE installmentId IN (SELECT id FROM installments WHERE subscriptionId IN (SELECT id FROM subscriptions WHERE customerId = ?))',
+                'DELETE FROM payments WHERE installmentId IN (SELECT id FROM installment WHERE subscriptionId IN (SELECT id FROM subscriptions WHERE customerId = ?))',
                 [customerId]
             );
         } catch (error) {
@@ -217,7 +217,7 @@ export class PaymentDAO {
     async deleteByPlanId(planId: string): Promise<void> {
         try {
             const [result] = await connection.query(
-                'DELETE FROM payments WHERE installmentId IN (SELECT id FROM installments WHERE subscriptionId IN (SELECT id FROM subscriptions WHERE planId = ?))',
+                'DELETE FROM payments WHERE installmentId IN (SELECT id FROM installment WHERE subscriptionId IN (SELECT id FROM subscriptions WHERE planId = ?))',
                 [planId]
             );
         } catch (error) {

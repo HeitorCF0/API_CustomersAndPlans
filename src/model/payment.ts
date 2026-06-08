@@ -3,7 +3,7 @@ import { Installment } from "./installment";
 export enum paymentStatus {
     Paid = 'PAID',
     Pending = 'PENDING',
-    Failed = 'FAILED'
+    Canceled = 'CANCELED'
 }
 
 export enum paymentMethod {

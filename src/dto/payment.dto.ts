@@ -1,6 +1,6 @@
-import { IsNotEmpty, IsNumber, IsString, IsEnum } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, IsEnum, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
-import { Installment } from "../model/installment";
+import { paymentStatus, paymentMethod } from "../model/payment"
 
 export class PaymentListDTO {
     id: string;
@@ -26,33 +26,47 @@ export class PaymentListByIdDTO {
     customerName: string;
 }
 
-export class CreatePaymentDTO {
-    @IsNotEmpty()
-    @IsString()
-    id: string;
-
+export class PaymentCreateDTO {
     @IsNotEmpty()
     @IsString()
     installmentId: string;
-
-    @Type(() => Installment)
-    installment?: Installment;
 
     @IsNotEmpty()
     @IsNumber()
     amount: number;
 
     @IsNotEmpty()
-    @IsEnum()
-    status: string;
+    @IsString()
+    @IsEnum(paymentStatus)
+    status: paymentStatus;
+
+    @IsNotEmpty()
+    @IsString()
+    @IsEnum(paymentMethod)
+    paymentMethod: paymentMethod;
+
+    @IsOptional()
+    @IsString()
+    comment?: string | null;
 }
 
-        // id: string;
-        // installmentId: string;
-        // installment?: Installment;
-        // amount: number;
-        // status: paymentStatus;
-        // comment: string | null;
-        // paidDate: Date;
-        // paymentMethod: paymentMethod;
+export class PaymentUpdateDTO {
+    @IsOptional()
+    @IsNumber()
+    amount?: number;
+
+    @IsOptional()
+    @IsString()
+    @IsEnum(paymentStatus)
+    status?: paymentStatus;
+
+    @IsOptional()
+    @IsString()
+    @IsEnum(paymentMethod)
+    paymentMethod?: paymentMethod;
+
+    @IsOptional()
+    @IsString()
+    comment?: string | null;
+}
 

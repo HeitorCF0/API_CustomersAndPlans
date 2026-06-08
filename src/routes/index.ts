@@ -7,6 +7,7 @@ import addressRoutes from './address.routes';
 import planRoutes from './plan.routes';
 import subscriptionRoutes from './subscription.routes';
 import installmentRoutes from './installment.routes';
+import paymentRoutes from './payment.routes';
 
 const routes = Router();
 
@@ -18,5 +19,6 @@ routes.use('/email', emailRoutes)
 routes.use('/phone', phoneRoutes)
 routes.use('/address', addressRoutes)
 routes.use('/installment', installmentRoutes)
+routes.use('/payment', paymentRoutes)
 
 export default routes;
