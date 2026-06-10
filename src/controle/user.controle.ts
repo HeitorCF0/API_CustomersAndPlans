@@ -1,8 +1,12 @@
 import { Request, Response } from 'express';
-import { UserCreateDTO, UserUpdateDTO } from '../dto/user.dto';
+import { UserCreateDTO, UserUpdateDTO, UserLoginDTO } from '../dto/user.dto';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { UserService } from '../service/user.service';
+import { PasswordCrypto } from '../service/passwordCrypto';
+import { User } from '../model/user';
+import jwt from 'jsonwebtoken';
+import 'dotenv/config';
 
 export class UserControle {
     private userService: UserService;
@@ -30,14 +34,20 @@ export class UserControle {
 
     public async searchAll(req: Request, res:Response){
         const userDTO = await this.userService.searchAll()
-        res.status(200).json(userDTO).send()
+        res.status(200).json(userDTO);
     }
 
     public async searchById(req: Request, res:Response){
         const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
 
         const userDTO = await this.userService.searchById(id);
-        res.status(200).json(userDTO).send();
+        res.status(200).json(userDTO);
+    }
+
+    public async searchByEmail(email: string){
+
+        const user = await this.userService.searchByEmail(email);
+        return user;
     }
 
     public async update(req: Request, res: Response) {
@@ -65,5 +75,28 @@ export class UserControle {
         const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         await this.userService.delete(id);
         res.status(200).json({ message:'User deleted successfully' });
+    }
+
+    public async login(req: Request, res: Response) {
+        try {
+            const userLoginDTO = plainToInstance(UserLoginDTO, req.body);
+            const errors = await validate(userLoginDTO);
+
+            if (errors.length > 0) {
+                return res.status(400).json({ errors });
+            }
+
+            const user = await this.searchByEmail(userLoginDTO.email);
+
+            if (user == null || !(await PasswordCrypto.verifyPassword(userLoginDTO.password, user.password))) {
+                return res.status(401).json({ message: 'Incorrect email or password' });
+            }
+
+            const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            res.status(200).json({ token, userId: user.id });
+        } catch (error: any) {
+            console.error('Error during login:', error);
+            res.status(500).json({ error: error.message || 'Error during login' });
+        }
     }
 }

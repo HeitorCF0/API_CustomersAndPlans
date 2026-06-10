@@ -56,6 +56,19 @@ export class UserDAO {
         }
     }
 
+    async searchByEmail(email: string): Promise<User | null> {
+        try {
+            const [user]: any = await connection.query('SELECT * FROM users WHERE email = ?', [email]);
+            if (user.length === 0) {
+                return null;
+            }
+            return user[0];
+        } catch (error) {
+            console.error('Error searching user by email:', error);
+            throw new Error('Failed to search user by email');
+        }
+    }
+
     async update(user: User): Promise<void> {
         try{
             const [result]: any = await connection.query(

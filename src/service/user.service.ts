@@ -33,6 +33,14 @@ export class UserService {
         return userDTO
     }
 
+    public async searchByEmail(email: string): Promise <User | null>{
+        const user: User | null = await this.userDAO.searchByEmail(email)
+        if (user) {
+            return User.reconstruct(user)
+        }
+        return null
+    }
+
     public async update(id: string, userUpdateDTO: UserUpdateDTO) {// atualiza todos os dados mesmo os não alterados
         try {
             const existingUser = await this.userDAO.updateSearchById(id);

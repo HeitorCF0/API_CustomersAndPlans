@@ -60,3 +60,13 @@ export class UserSearchByIdDTO {
     role: string
     createdAt: Date
 }
+
+export class UserLoginDTO {
+    @IsNotEmpty()
+    @IsEmail()
+    email: string;
+
+    @IsNotEmpty()
+    @IsString()
+    password: string;
+}
