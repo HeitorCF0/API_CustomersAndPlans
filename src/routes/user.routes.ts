@@ -9,19 +9,19 @@ const userDAO = new UserDAO();
 const userService = new UserService(userDAO)
 const userControle = new UserControle(userService)
 
-// Rota pública - Login
+// public route - Login
 userRoutes
     .route('/login')
     .post(async (req, res) => userControle.login(req, res))
 
-// Rota pública - Criar novo usuário
+// public route
 userRoutes
     .route('/')
     .post(async (req, res) => userControle.create(req, res))
     // Rota protegida - Listar todos os usuários
     .get(authToken, async (req, res) => userControle.searchAll(req, res));
 
-// Rotas protegidas - Operações por ID
+// protected routes
 userRoutes
     .route('/:id')
     .get(authToken, async (req, res) => userControle.searchById(req, res))
