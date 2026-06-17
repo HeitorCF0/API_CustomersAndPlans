@@ -1,15 +1,17 @@
 import { UserDAO } from '../dao/user.dao'
 import { UserCreateDTO, UserUpdateDTO, UserSearchAllDTO, UserSearchByIdDTO } from '../dto/user.dto'
 import { User } from '../model/user'
+import { PasswordCrypto } from './passwordCrypto';
 
 export class UserService {
     public constructor (private readonly userDAO: UserDAO) {}
 
     public async create(userCreateDTO: UserCreateDTO){
         try{
-        const user = User.construct(userCreateDTO);
+            userCreateDTO.password = await PasswordCrypto.hashPassword(userCreateDTO.password);
+            const user = User.construct(userCreateDTO);
 
-        await this.userDAO.create(user)
+            await this.userDAO.create(user)
         }catch (error){
             throw error
         }
@@ -31,6 +33,14 @@ export class UserService {
         return userDTO
     }
 
+    public async searchByEmail(email: string): Promise <User | null>{
+        const user: User | null = await this.userDAO.searchByEmail(email)
+        if (user) {
+            return User.reconstruct(user)
+        }
+        return null
+    }
+
     public async update(id: string, userUpdateDTO: UserUpdateDTO) {// atualiza todos os dados mesmo os não alterados
         try {
             const existingUser = await this.userDAO.updateSearchById(id);
@@ -39,6 +49,11 @@ export class UserService {
             }
 
             const user = User.reconstruct(existingUser[0]);
+
+            if (userUpdateDTO.password != undefined) {
+                userUpdateDTO.password = await PasswordCrypto.hashPassword(userUpdateDTO.password);
+            }
+
             user.update(userUpdateDTO);
 
             await this.userDAO.update(user);
