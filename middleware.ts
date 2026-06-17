@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
+import { UserRole } from './src/model/user'
+
 
 interface AuthRequest extends Request {
     user?: any;
@@ -50,6 +52,24 @@ export function authToken(req: AuthRequest, res: Response, next: NextFunction): 
         });
     } catch (error) {
     res.status(500).json({ error: 'Internal server error during authentication' });
+    }
+}
+
+export function requireAdmin(req: AuthRequest, res: Response, next: NextFunction): void {
+    try {
+        if (req.user == undefined) {
+            res.status(401).json({ error: 'User is not authenticated' });
+            return;
+        }
+
+        if (req.user.role !== UserRole.Admin) {
+            res.status(403).json({ error: 'Access denied. Admin role required' });
+            return;
+        }
+
+        next();
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error during authorization' });
     }
 }
 
