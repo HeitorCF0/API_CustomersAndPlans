@@ -18,7 +18,7 @@ export class SubscriptionDAO {
         }
     }
 
-    async searchAll(): Promise<SubscriptionListDTO[]> {// CONSERTAR TIPAGEM
+    async searchAll(): Promise<SubscriptionListDTO[]> {
         try {
             const [subscriptionListDTO] = await connection.query<SubscriptionListDTO[] & RowDataPacket[]>(
                 `SELECT 

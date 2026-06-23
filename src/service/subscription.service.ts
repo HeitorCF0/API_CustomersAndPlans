@@ -3,6 +3,7 @@ import { SubscriptionCreateDTO } from "../dto/subscription.dto";
 import { CustomerDAO } from "../dao/customer.dao";
 import { PlanDAO } from "../dao/plan.dao";
 import { Subscription } from "../model/subscription";
+import { customerStatus } from "../model/customer";
 
 export class SubscriptionService {
     public constructor (private readonly subscriptionDAO: SubscriptionDAO) {}
@@ -11,6 +12,9 @@ export class SubscriptionService {
         try{
             if(!await this.customerExists(subscriptionCreateDTO.customerId)){
                 throw new Error("Customer not found");
+            }
+            if (!await this.customerActive(subscriptionCreateDTO.customerId)){
+                throw new Error("Inactive user")
             }
             if(!await this.planExists(subscriptionCreateDTO.planId)){
                 throw new Error("Plan not found");
@@ -56,10 +60,28 @@ export class SubscriptionService {
         }
     }
 
+    public async delete(id: string) {
+        try {
+            const subscription = await this.subscriptionDAO.searchById(id);
+            if (!subscription) {
+                throw new Error("Subscription not found");
+            }
+            await this.subscriptionDAO.delete(id);
+        } catch (error) {
+            throw new Error("Error deleting subscription: " + (error instanceof Error ? error.message : 'Unknown error'));
+        }
+    }
+
     public async customerExists(customerId: string): Promise<boolean> {
         const customerDAO = new CustomerDAO();
         const result = await customerDAO.searchById(customerId);
         return result !== null;
+    }
+
+    public async customerActive(customerId: string): Promise<boolean> {
+        const customerDAO = new CustomerDAO();
+        const result = await customerDAO.searchById(customerId);
+        return result?.customer[0].status !== customerStatus.Inactive;
     }
 
     public async planExists(planId: string): Promise<boolean> {
@@ -71,17 +93,5 @@ export class SubscriptionService {
     public async customerHasActiveSubscription(customerId: string): Promise<boolean> {
         const activeSubscription = await this.subscriptionDAO.searchByCustomerId(customerId);
         return activeSubscription !== null;
-    }
-
-    public async delete(id: string) {
-        try {
-            const subscription = await this.subscriptionDAO.searchById(id);
-            if (!subscription) {
-                throw new Error("Subscription not found");
-            }
-            await this.subscriptionDAO.delete(id);
-        } catch (error) {
-            throw new Error("Error deleting subscription: " + (error instanceof Error ? error.message : 'Unknown error'));
-        }
     }
 }

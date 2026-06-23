@@ -1,5 +1,5 @@
-import { RowDataPacket } from "mysql2";
-import { Customer } from "../model/customer";
+import { FieldPacket, RowDataPacket } from "mysql2";
+import { Customer, propsCustomer } from "../model/customer";
 import { connection } from "../util/connection";
 import { CustomersListDTO, CustomerUpdateDTO } from '../dto/customer.dto';
 
@@ -71,7 +71,7 @@ export class CustomerDAO {
 
     async searchById(id: string) {//implementar quando fizer o crud de email, phone e adress
         try {
-            const [customer] : any = await connection.query(`
+            const [customer] : [propsCustomer[], FieldPacket[]] = await connection.query <propsCustomer[]  & RowDataPacket[]>(`
                 SELECT 
                 c.*
                 FROM customers c
