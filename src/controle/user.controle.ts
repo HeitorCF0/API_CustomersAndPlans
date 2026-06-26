@@ -85,6 +85,10 @@ export class UserControle {
                 return res.status(400).json({ errors });
             }
 
+            if (!process.env.JWT_SECRET) {
+                throw new Error("JWT_SECRET environment variable is missing");
+            }
+
             const user = await this.searchByEmail(userLoginDTO.email);
 
             if (user == null || !(await PasswordCrypto.verifyPassword(userLoginDTO.password, user.password))) {
