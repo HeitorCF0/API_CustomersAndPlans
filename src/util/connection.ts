@@ -4,5 +4,5 @@ export const connection = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'API_web',
+  database: 'database_development',
 });

@@ -9,18 +9,15 @@ const userDAO = new UserDAO();
 const userService = new UserService(userDAO)
 const userControle = new UserControle(userService)
 
-// public route - Login
 userRoutes
     .route('/login')
     .post(async (req, res) => userControle.login(req, res))
 
-// public route
 userRoutes
     .route('/')
     .post(async (req, res) => userControle.create(req, res))
     .get(authToken, requireAdmin, async (req, res) => userControle.searchAll(req, res));
 
-// protected routes
 userRoutes
     .route('/:id')
     .get(authToken, requireAdmin, async (req, res) => userControle.searchById(req, res))

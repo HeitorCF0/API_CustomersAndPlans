@@ -2,7 +2,6 @@ import { Email } from '../model/email';
 import { EmailDAO } from '../dao/email.dao'
 import { EmailCreateDTO, EmailUpdateDTO } from '../dto/email.dto';
 import { CustomerDAO } from '../dao/customer.dao';
-import { Customer } from '../model/customer';
 
 export class EmailService {
     public constructor (private readonly emailDAO: EmailDAO) {}

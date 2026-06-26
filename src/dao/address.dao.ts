@@ -1,6 +1,6 @@
 import { Address } from "../model/address";
 import { connection } from "../util/connection";
-import { AddressCreateDTO, AddressListDTO, AddressUpdateDTO } from "../dto/address.dto";
+import { AddressListDTO, AddressUpdateDTO } from "../dto/address.dto";
 import { RowDataPacket } from "mysql2";
 import { Customer } from "../model/customer";
 

@@ -1,6 +1,7 @@
 import { PlanDAO } from "../dao/plan.dao"; 
-import { PlanCreateDTO, PlanSearchAllDTO, PlanSearchByIdDTO, PlanUpdateDTO } from "../dto/plan.dto";
-import { Plan, planType } from "../model/plan";
+import { SubscriptionDAO } from "../dao/subscription.dao";
+import { PlanCreateDTO, PlanSearchAllDTO, PlanUpdateDTO } from "../dto/plan.dto";
+import { Plan } from "../model/plan";
 
 export class PlanService {
 
@@ -68,12 +69,20 @@ export class PlanService {
         }
     }
 
-    public async delete(id: string, planDeleteDTO: PlanSearchByIdDTO) {
+    public async delete(id: string) {
         try {
+            if (await this.haveActiveSubscriptions(id)){
+                throw new Error("Plan has active subscriptions");
+            }
             await this.planDAO.delete(id);
         } catch (error) {
-            throw error
+            throw new Error("Error deleting plan: " + (error instanceof Error ? error.message : 'Unknown error'));
         }
     }
 
+    public async haveActiveSubscriptions(id: string) : Promise <boolean> {
+        const subscriptionDAO = new SubscriptionDAO();
+        const result = await subscriptionDAO.searchActivesByPlanId(id);
+        return result.length > 0;
+    }
 }

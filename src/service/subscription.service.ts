@@ -20,7 +20,7 @@ export class SubscriptionService {
                 throw new Error("Plan not found");
             }
             if(await this.customerHasActiveSubscription(subscriptionCreateDTO.customerId)){
-                throw new Error("Customer already has an active subscription in this plan");
+                throw new Error("Customer already has a subscription in this plan");
             }
 
             const subscription = Subscription.construct(subscriptionCreateDTO);

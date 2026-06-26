@@ -1,4 +1,16 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { RowDataPacket } from "mysql2";
+
+export interface AddressAndId extends RowDataPacket {
+    id: string;
+    street: string;
+    number: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+    cep: string;
+    complement: string;
+}
 
 export class AddressCreateDTO {
     @IsNotEmpty()

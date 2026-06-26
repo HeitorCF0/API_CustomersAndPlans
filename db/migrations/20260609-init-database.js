@@ -107,6 +107,7 @@ module.exports = {
           model: 'customers',
           key: 'id',
         },
+        onDelete: 'CASCADE',
       },
       planId: {
         type: Sequelize.STRING(100),
@@ -115,6 +116,7 @@ module.exports = {
           model: 'plans',
           key: 'id',
         },
+        onDelete: 'CASCADE',
       },
     });
 

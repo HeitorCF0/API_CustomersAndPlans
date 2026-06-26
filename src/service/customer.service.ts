@@ -5,6 +5,9 @@ import { SubscriptionDAO } from '../dao/subscription.dao';
 import { AddressDAO } from '../dao/address.dao';
 import { CustomerCreateDTO, CustomersListDTO, CustomerUpdateDTO } from '../dto/customer.dto'
 import { Customer } from '../model/customer';
+import { EmailAndId } from '../dto/email.dto'
+import { PhoneAndId } from '../dto/phone.dto'
+import { AddressAndId } from '../dto/address.dto'
 
 export class CustomerService {
     public constructor (private readonly customerDAO: CustomerDAO) {}
@@ -30,7 +33,7 @@ export class CustomerService {
     public async searchById(id: string) {
         const customerInfo = await this.customerDAO.searchById(id);
         if (customerInfo) {
-            const customer = [customerInfo.customer[0], customerInfo.email[0], customerInfo.phone[0], customerInfo.address[0]]
+            const customer = [customerInfo.customer[0], customerInfo.email, customerInfo.phone, customerInfo.address]
             return customer;
         }
         return null;
@@ -62,11 +65,13 @@ export class CustomerService {
                 throw new Error('Customer not found');
             }
 
-            if (await this.customerHasSubscription(id)) {
-                throw new Error('Customer has associated subscription')
+            if (await this.haveActiveSubscriptions(id)) {
+                throw new Error('Customer has associated active subscription')
             }
 
-            if (await this.customerHasEmail(id)) {
+            const [hasEmail, hasPhone, hasAddress] = await this.customerHasInfo(id)
+
+            if (hasEmail == true) {
                 try {
                     const emailDao = new EmailDAO();
                     await emailDao.deleteByCustomerId(id);
@@ -74,7 +79,7 @@ export class CustomerService {
                     throw error;
                 }
             }
-            if (await this.customerHasPhone(id)) {
+            if (hasPhone == true) {
                 try {
                     const phoneDao = new PhoneDAO();
                     await phoneDao.deleteByCustomerId(id);
@@ -82,7 +87,7 @@ export class CustomerService {
                     throw error;
                 }
             }
-            if (await this.customerHasAddress(id)) {
+            if (hasAddress == true) {
                 try {
                     const addressDao = new AddressDAO();
                     await addressDao.deleteByCustomerId(id);
@@ -90,58 +95,52 @@ export class CustomerService {
                     throw error;
                 }
             }
+
             await this.customerDAO.delete(id);
         } catch (error) {
             throw error;
         }
     }
 
-    public async customerHasEmail(id: string): Promise<boolean> {
+    public async customerHasInfo(id: string) : Promise<boolean[]>{
         try {
             const customerInfo = await this.customerDAO.searchById(id);
-            if (customerInfo && customerInfo.email && customerInfo.email.length > 0) {
-                return true;
+            if (customerInfo != null) {
+                const hasEmail = await this.customerHasEmail(customerInfo.email)
+                const hasPhone = await this.customerHasPhone(customerInfo.phone)
+                const hasAddress = await this.customerHasAddress(customerInfo.address)
+                return [hasEmail, hasPhone, hasAddress]
             }
-            return false;
+            return [false, false, false];
         } catch (error) {
             throw error;
         }
     }
 
-    public async customerHasPhone(id: string): Promise<boolean> {
-        try {
-            const customerInfo = await this.customerDAO.searchById(id);
-            if (customerInfo && customerInfo.phone && customerInfo.phone.length > 0) {
-                return true;
-            }
-            return false;
-        } catch (error) {
-            throw error;
+    public async customerHasEmail(emails: EmailAndId[]) {
+        if (emails.length > 0) {
+            return true;
         }
+        return false;
     }
 
-    public async customerHasAddress(id: string): Promise<boolean> {
-        try {
-            const customerInfo = await this.customerDAO.searchById(id);
-            if (customerInfo && customerInfo.address && customerInfo.address.length > 0) {
-                return true;
-            }
-            return false;
-        } catch (error) {
-            throw error;
+    public async customerHasPhone(phones: PhoneAndId[]) {
+        if (phones.length > 0) {
+            return true;
         }
+        return false;
     }
 
-    public async customerHasSubscription(id: string): Promise<boolean> {
-        try {
-            const subscriptionDAO = new SubscriptionDAO();
-            const subscriptions = await subscriptionDAO.searchByCustomerId(id);
-            if (subscriptions && subscriptions.length > 0) {
-                return true;
-            }
-            return false;
-        } catch (error) {
-            throw error;
+    public async customerHasAddress(address: AddressAndId[]) {
+        if (address.length > 0) {
+            return true;
         }
+        return false;
+    }
+
+    public async haveActiveSubscriptions(id: string) : Promise <boolean> {
+        const subscriptionDAO = new SubscriptionDAO();
+        const result = await subscriptionDAO.searchActivesByPlanId(id);
+        return result.length > 0;
     }
 }

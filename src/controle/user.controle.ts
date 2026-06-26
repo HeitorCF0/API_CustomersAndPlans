@@ -4,7 +4,6 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { UserService } from '../service/user.service';
 import { PasswordCrypto } from '../service/passwordCrypto';
-import { User } from '../model/user';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 

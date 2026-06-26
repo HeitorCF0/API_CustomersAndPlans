@@ -1,6 +1,5 @@
 import { IsNotEmpty, IsNumber, IsString, IsEnum, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
-import { Customer } from '../model/customer';
 import { installmentState } from '../model/installment';
 
 export class InstallmentListDTO {

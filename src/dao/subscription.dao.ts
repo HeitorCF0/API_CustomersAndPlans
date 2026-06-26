@@ -1,7 +1,5 @@
 import { Subscription } from "../model/subscription";
 import { connection } from "../util/connection";
-import { Customer } from "../model/customer";
-import { Plan } from "../model/plan";
 import { SubscriptionListDTO, subscriptionSearchByIdDTO } from "../dto/subscription.dto";
 import { RowDataPacket } from "mysql2";
 
@@ -108,6 +106,22 @@ export class SubscriptionDAO {
                 JOIN customers c ON sub.customerId = c.id 
                 JOIN plans p ON sub.planId = p.id
                 WHERE sub.planId = ?`, [planId]);
+            return subscriptionListDTO;
+        } catch (error) {
+            console.error('Error searching subscriptions by plan ID:', error);
+            throw new Error('Failed to search subscriptions by plan ID');
+        }
+    }
+
+    async searchActivesByPlanId(planId: string): Promise<SubscriptionListDTO[]> {
+        try {
+            const [subscriptionListDTO] = await connection.query<SubscriptionListDTO[] & RowDataPacket[]>(
+                `SELECT
+                sub.id,
+                sub.planId,
+                sub.state
+                FROM subscriptions sub 
+                WHERE sub.planId = ? AND sub.state = ?`, [planId, "active"]);
             return subscriptionListDTO;
         } catch (error) {
             console.error('Error searching subscriptions by plan ID:', error);

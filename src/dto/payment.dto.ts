@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsNumber, IsString, IsEnum, IsOptional } from "class-validator";
-import { Type } from "class-transformer";
 import { paymentStatus, paymentMethod } from "../model/payment"
 
 export class PaymentListDTO {

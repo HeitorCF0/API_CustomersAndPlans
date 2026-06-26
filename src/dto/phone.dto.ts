@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { RowDataPacket } from "mysql2";
 
 export class PhoneCreateDTO {
     @IsNotEmpty()
@@ -21,4 +22,9 @@ export class PhoneUpdateDTO {
     @IsNotEmpty()
     @IsString()
     phone: string;
+}
+
+export interface PhoneAndId extends RowDataPacket {
+    id: string;
+    email:string
 }
